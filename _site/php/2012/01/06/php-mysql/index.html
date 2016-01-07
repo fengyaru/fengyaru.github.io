@@ -1,0 +1,429 @@
+<!DOCTYPE html lang="en-US">
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="description" content="寞踪的技术博客，主攻PHP，iOS，Python，Linux，C。">
+<meta name="keyword"  content="寞踪的博客">
+<link rel="shortcut icon" href="img/favicon.ico">
+<title>PHP连接多个mysql数据库的类 - 寞踪的博客 | Ellen Blog</title>
+<link rel="canonical" href="http://xpmozong.github.io/php/2012/01/06/php-mysql/">
+<link href="http://cdn.staticfile.org/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+<link rel='stylesheet' href="/css/style.css" type='text/css' media='all' />
+<link rel='stylesheet' href="/css/color/green.css" type='text/css' media='all' />
+<link href="/google-code-prettify/tomorrow-night-eighties.css" rel="stylesheet" type="text/css" media="all">
+<script src="/google-code-prettify/jquery.js"></script>
+<script src="/google-code-prettify/prettify.js"></script>
+<body class="home blog">
+    <!-- Start Header -->
+    <div class="container zerogrid clearfix">
+        <div class="col-full">
+            <div class="wrap-col">
+                <div id="header-nav-container" class="clearfix">
+                    <div class="h-logo">
+                        <a href="/">
+                            寞踪的博客
+                        </a>
+                    </div>
+                    <div class="h-menu">
+                        <!-- Navigation Menu -->     
+                        <ul class="sf-menu">
+                            <li id="home" class="menu-item current-menu-item">
+                                <a href="/">Home</a>
+                            </li>
+                            <li id="about" class="menu-item">
+                                <a href="/about/">About</a>
+                            </li>
+                            <li id="tags" class="menu-item">
+                                <a href="/tags/">Tags</a>
+                            </li>
+                        </ul> 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<!-- Start Main Container -->
+<div class="container zerogrid">
+    <div class="col-full">
+        <div class="wrap-col page-conainer">
+            <div class="post-margin">
+                <h5 class="page-title">
+                    PHP连接多个mysql数据库的类
+                </h5>
+                
+                <div class="post-subtitle">
+                    
+                </div>
+                
+                <ul class="post-status clearfix">
+                    <li><i class="fa fa-clock-o"></i>January 6, 2012</li>
+                </ul>
+                <div class="post-content">
+                    <p>mysql.php类</p>
+
+<pre><code>/*
+ * 定义一个连接类,可以访问建立多个数据库连接对象
+ *
+ * author 寞踪 http://weibo.com/xpmozong
+ *
+ */
+class mysql{
+    var $dbhost;            //数据库地址
+    var $dbuser;            //数据库用户名
+    var $dbpasswd;          //数据库密码
+    var $dbpconnect = 0;    //数据库长连接
+    var $dbname;            //数据库名称
+    var $dbchart;           //数据库链接编码
+    var $dblink;            //数据库连接对象
+    var $sql;               //sql语句
+    var $res;               //sql语句执行结果
+    var $errno;             //错误信息
+ 
+    function connect($dbConfig) {
+        $this-&gt;dbhost = $dbConfig['dbhost'];
+        $this-&gt;dbuser = $dbConfig['dbuser'];
+        $this-&gt;dbpasswd = $dbConfig['dbpasswd'];
+        $this-&gt;dbpconnect = $dbConfig['dbpconnect'];
+        $this-&gt;dbname = $dbConfig['dbname'];
+        $this-&gt;dbchart = $dbConfig['dbchart'];
+        if($this-&gt;dbpconnect) {
+            $this-&gt;dblink = mysql_pconnect($this-&gt;dbhost,$this-&gt;dbuser,$this-&gt;dbpasswd,1) 
+            or die('can not connect to mysql database!');
+        } else {
+            $this-&gt;dblink = mysql_connect($this-&gt;dbhost,$this-&gt;dbuser,$this-&gt;dbpasswd,1) 
+            or die('can not connect to mysql database!');
+        }
+        mysql_query('set names '.$this-&gt;dbchart, $this-&gt;dblink);
+        mysql_select_db($this-&gt;dbname, $this-&gt;dblink);
+        unset($dbConfig);
+    }
+ 
+    /**
+     * 数据库执行语句
+     *
+     * @return blooean
+     *
+     */
+    function query($sql, $die_msg = 1) {
+        $this-&gt;sql = $sql;
+        //可以用自定义错误信息的方法，就要压制本身的错误信息
+        $result = @mysql_query($sql, $this-&gt;dblink);
+        if($result == true) {
+            return $result;
+        }else{
+            //有错误发生
+            $this-&gt;errno = mysql_error($this-&gt;dblink);
+            if($this-&gt;errno &gt;0) {
+                if($die_msg == 1) {
+                    //强制报错并且die
+                    $this-&gt;msg();
+                }else{
+                    return $this-&gt;errno;//无强制报错，则返回错误代码
+                }
+            }
+        }
+    }
+ 
+    /**
+     * 获得查询语句单条结果
+     *
+     * @return array
+     *
+     */
+    function getOne($sql) {
+        $this-&gt;sql = $sql;
+        $this-&gt;res = $this-&gt;query($sql);
+        return mysql_fetch_assoc($this-&gt;res);
+    }
+ 
+    /**
+     * 获得查询语句多条结果
+     *
+     * @return array
+     *
+     */
+    function getAll($sql) {
+        $this-&gt;sql = $sql;
+        $this-&gt;res = $this-&gt;query($sql);
+        $arr = array();
+        while($row = mysql_fetch_assoc($this-&gt;res)) {
+            $arr[] = $row;
+        }
+        return $arr;
+    }
+ 
+    /**
+     * 取得结果数据
+     *
+     * @param resource $query
+     *
+     * @return string
+     *
+     */
+    function result($query, $row) {
+        $query = @mysql_result($query, $row);
+        return $query;
+    }
+ 
+    /**
+     * 获得刚插入数据的id
+     *
+     * @return int id
+     *
+     */
+    function getInsertID() {
+        return ($id = mysql_insert_id($this-&gt;dblink)) &gt;= 0 ? $id : 
+        $this-&gt;result($this-&gt;query('SELECT last_insert_id()'), 0);
+    }
+ 
+    /**
+     * 关闭数据库连接，当您使用持续连接时该功能失效
+     *
+     * @return blooean
+     *
+     */
+    function close() {
+        return mysql_close($this-&gt;dblink);
+    }
+ 
+    /**
+     * 显示自定义错误
+     *
+     */
+    function msg() {
+        if($this-&gt;errno) {
+            //可以根据错误ID，配置好一些友好的错误信息提示语句
+            $msgArr = array();
+            $msgArr['1062'] = "唯一性索引有重复值插入";
+            /*...更多错误代码根据实际业务再添加...*/
+            if($msgArr[$this-&gt;errno]) {
+                $errMsg = $msgArr[$this-&gt;errno];//已定义的错误
+            }else{
+                $errMsg = mysql_error();//未定义的错误，由默认的错误信息决定
+            }
+            echo "&lt;div style='color:red;'&gt;\n";
+                echo "&lt;h4&gt;数据库操作错误&lt;/h4&gt;\n";
+                echo "&lt;h5&gt;错误代码：".$this-&gt;errno."&lt;/h5&gt;\n";
+                echo "&lt;h5&gt;错误信息：".$errMsg."&lt;/h5&gt;\n";
+            echo "&lt;/div&gt;";
+            unset($msgArr);
+            die;
+        }
+    }
+ 
+    function __destruct() {
+        $this-&gt;dbhost;
+        $this-&gt;dbuser;
+        $this-&gt;dbpasswd;
+        $this-&gt;dbpconnect;
+        $this-&gt;dbname;
+        $this-&gt;dbchart;
+        $this-&gt;dblink;
+        $this-&gt;sql;
+        $this-&gt;res;
+        $this-&gt;errno;
+    }
+}
+</code></pre>
+
+<p>测试连接</p>
+
+<pre><code>$dbConfig1 = array( 'dbhost'     =&gt; 'localhost',
+                    'dbuser'     =&gt; 'root',
+                    'dbpasswd'   =&gt; '',
+                    'dbname'     =&gt; 'server',
+                    'dbpconnect' =&gt; 0,
+                    'dbchart'    =&gt; 'utf8');
+$db1 = new mysql();
+$db1-&gt;connect($dbConfig1);
+
+$arr = $db1-&gt;getOne("select * from user");
+print_r($arr);
+
+$db1-&gt;close();
+</code></pre>
+
+                </div>
+                
+                <!-- 多说 Share start -->
+                <div class="ds-share"
+                    style="text-align: right"
+                    data-thread-key="/php/2012/01/06/php-mysql"
+                    data-title="PHP连接多个mysql数据库的类"
+                    data-url="http://xpmozong.github.io/php/2012/01/06/php-mysql/"
+                    data-images="http://xpmozong.github.io/img/post-bg-2015.jpg"
+                    data-content="mysql.php类
+
+/*
+ * 定义一个连接类,可以访问建立多个数据库连接对象
+ *
+ * author 寞踪 http://weibo.com/xp... | 寞踪的博客 | Ellen Blog " >
+                    <div class="ds-share-inline">
+                      <ul  class="ds-share-icons-16">
+                        <li data-toggle="ds-share-icons-more"><a class="ds-more" href="#">分享到：</a></li>
+                        <li><a class="ds-wechat flat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+                        <li><a class="ds-weibo flat" href="javascript:void(0);" data-service="weibo">微博</a></li>
+                        <li><a class="ds-douban flat" href="javascript:void(0);" data-service="douban">豆瓣</a></li>
+                      </ul>
+                      <div class="ds-share-icons-more">
+                      </div>
+                    </div>
+                <hr>
+                </div>
+                <!-- 多说 Share end-->
+                
+                <div class="pager20">
+                    <ul class="pagination clearfix">
+                        
+                        <li class="previous">
+                            <a href="/php/2011/11/25/php-smarty/" data-toggle="tooltip" data-placement="top" title="smarty 生成静态化html文件">
+                                <i class="fa fa-arrow-circle-o-left"></i> Previous Post
+                            </a>
+                        </li>
+                        
+                        
+                        <li class="next">
+                            <a href="/php/2012/01/09/php-call-user-func-array/" data-toggle="tooltip" data-placement="top" title="PHP之call_user_func_array用法">
+                                Next Post <i class="fa fa-arrow-circle-o-right"></i>
+                            </a>
+                        </li>
+                        
+                    </ul>
+                </div>
+                
+                <!-- 多说评论框 start -->
+                <div class="comment">
+                    <div class="ds-thread"
+                        data-thread-key="/php/2012/01/06/php-mysql"
+                        data-title="PHP连接多个mysql数据库的类"
+                        data-url="http://xpmozong.github.io/php/2012/01/06/php-mysql/" >
+                    </div>
+                </div>
+                <!-- 多说评论框 end -->
+
+                <!-- Duoshuo hacking -->
+                <input id="dsUser" type="hidden" value="xpmozong"  />
+
+                <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+                <script type="text/javascript">
+                    // dynamic User hacking by Hux
+                    var _user = document.getElementById('dsUser').value;
+                    // duoshuo comment query.
+                    var duoshuoQuery = {short_name: _user };
+                    (function() {
+                        var ds = document.createElement('script');
+                        ds.type = 'text/javascript';ds.async = true;
+                        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+                        ds.charset = 'UTF-8';
+                        (document.getElementsByTagName('head')[0]
+                         || document.getElementsByTagName('body')[0]).appendChild(ds);
+                    })();
+                </script>
+                <!-- 多说公共JS代码 end -->
+                
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Main Container -->
+<p id="back-top"><a href="#top"></a></p>
+<!-- Start Footer -->
+<div class="container zerogrid clearfix">
+    <div id="footer-container" class="wrap-col">
+        <p>Copyrigh &copy; 寞踪的博客 2010-2015</p>
+    </div>
+</div>
+<!-- End Footer -->
+<!-- async load function -->
+<script type="text/javascript">
+    function async(u, c) {
+        var d = document, t = 'script',
+        o = d.createElement(t),
+        s = d.getElementsByTagName(t)[0];
+        o.src = u;
+        if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+        s.parentNode.insertBefore(o, s);
+    }
+
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+    
+    $(function(){
+        var href = location.href;
+        var localh = location.origin+"/";
+        href = href.replace(localh,"");
+        var hrearr = href.split('/');
+        $(".sf-menu li").removeClass('current-menu-item');
+        if (hrearr[0] == 'about') {
+            $("#about").addClass('current-menu-item');
+        }else if(hrearr[0] == 'tags'){
+            $("#tags").addClass('current-menu-item');
+        }else{
+            $("#home").addClass('current-menu-item');
+        }
+
+        $("pre").addClass("prettyprint");
+        prettyPrint();
+
+        // hide #back-top first
+        $("#back-top").hide();
+
+        // fade in #back-top
+        $(function () {
+            $(window).scroll(function () {
+                if ($(this).scrollTop() > 400) {
+                    $('#back-top').fadeIn();
+                } else {
+                    $('#back-top').fadeOut();
+                }
+        });
+
+        // scroll body to 0px on click
+        $('#back-top a').click(function () {
+            $('body,html').animate({
+                scrollTop: 0
+                }, 800);
+            return false;
+            });
+        });
+
+    });
+
+</script>
+</body>
+</html>
+
+
+
+
+
+<!-- BT hacking -->
+<input id="baId" type="hidden" value="6dcc729d6a5d5c61d7c8835eb7418d54"  />
+
+<!-- Baidu Tongji -->
+<script>
+    // dynamic User hacking by Hux
+    var _baId = document.getElementById('baId').value;
+
+    // Originial
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?" + _baId;
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+

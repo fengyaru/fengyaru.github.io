@@ -1,0 +1,396 @@
+<!DOCTYPE html lang="en-US">
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="description" content="寞踪的技术博客，主攻PHP，iOS，Python，Linux，C。">
+<meta name="keyword"  content="寞踪的博客">
+<link rel="shortcut icon" href="img/favicon.ico">
+<title>php opcache使用 - 寞踪的博客 | Ellen Blog</title>
+<link rel="canonical" href="http://xpmozong.github.io/php/2015/08/19/php-opcache/">
+<link href="http://cdn.staticfile.org/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+<link rel='stylesheet' href="/css/style.css" type='text/css' media='all' />
+<link rel='stylesheet' href="/css/color/green.css" type='text/css' media='all' />
+<link href="/google-code-prettify/tomorrow-night-eighties.css" rel="stylesheet" type="text/css" media="all">
+<script src="/google-code-prettify/jquery.js"></script>
+<script src="/google-code-prettify/prettify.js"></script>
+<body class="home blog">
+    <!-- Start Header -->
+    <div class="container zerogrid clearfix">
+        <div class="col-full">
+            <div class="wrap-col">
+                <div id="header-nav-container" class="clearfix">
+                    <div class="h-logo">
+                        <a href="/">
+                            寞踪的博客
+                        </a>
+                    </div>
+                    <div class="h-menu">
+                        <!-- Navigation Menu -->     
+                        <ul class="sf-menu">
+                            <li id="home" class="menu-item current-menu-item">
+                                <a href="/">Home</a>
+                            </li>
+                            <li id="about" class="menu-item">
+                                <a href="/about/">About</a>
+                            </li>
+                            <li id="tags" class="menu-item">
+                                <a href="/tags/">Tags</a>
+                            </li>
+                        </ul> 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<!-- Start Main Container -->
+<div class="container zerogrid">
+    <div class="col-full">
+        <div class="wrap-col page-conainer">
+            <div class="post-margin">
+                <h5 class="page-title">
+                    php opcache使用
+                </h5>
+                
+                <div class="post-subtitle">
+                    
+                </div>
+                
+                <ul class="post-status clearfix">
+                    <li><i class="fa fa-clock-o"></i>August 19, 2015</li>
+                </ul>
+                <div class="post-content">
+                    <p><strong>介绍</strong></p>
+
+<p>php opcache的缓存原理，主要是避免php重复编译，减少CPU和内存开销。</p>
+
+<p><strong>安装</strong></p>
+
+<p>到http://pecl.php.net/package/ZendOpcache下载</p>
+
+<pre><code>tar zxvf zendopcache-7.0.5.tgz
+cd zendopcache-7.0.5
+phpize
+./configure
+make &amp;&amp; make install
+</code></pre>
+
+<p><strong>配置</strong></p>
+
+<p>修改php.ini，在最后添加</p>
+
+<pre><code>[Zend Opcache]
+zend_extension = "/usr/local/php-5.4.10/lib/php/extensions/no-debug-non-zts-20100525/opcache.so"
+opcache.force_restart_timeout=3600
+opcache.memory_consumption=1024
+opcache.optimization_level=1
+opcache.interned_strings_buffer=8
+opcache.max_accelerated_files=4096
+opcache.revalidate_freq=60
+opcache.fast_shutdown=1
+opcache.enable=1
+opcache.enable_cli=1
+</code></pre>
+
+<p><strong>启动</strong></p>
+
+<p>重启php-fpm或者apache/nginx</p>
+
+<p><strong>查看</strong></p>
+
+<p>phpinfo中，Zend OPcache</p>
+
+<pre><code>Cache hits 
+Cache misses
+</code></pre>
+
+<p>看这两个值</p>
+
+<p><strong>压力测试</strong></p>
+
+<p>1、未使用opcache</p>
+
+<pre><code>./ab -n 100 -c 100 http://127.0.0.1/phpinfo.php
+
+This is ApacheBench, Version 2.3 &lt;$Revision: 655654 $&gt;
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 127.0.0.1 (be patient).....done
+
+Server Software:        nginx
+Server Hostname:        127.0.0.1
+Server Port:            80
+
+Document Path:          /phpinfo.php
+Document Length:        56203 bytes
+
+Concurrency Level:      100
+Time taken for tests:   1.849 seconds
+Complete requests:      100
+Failed requests:        4
+   (Connect: 0, Receive: 0, Length: 4, Exceptions: 0)
+Write errors:           0
+Total transferred:      5635595 bytes
+HTML transferred:       5620295 bytes
+Requests per second:    54.08 [#/sec] (mean)
+Time per request:       1848.981 [ms] (mean)
+Time per request:       18.490 [ms] (mean, across all concurrent requests)
+Transfer rate:          2976.51 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    3   0.9      3       4
+Processing:    45 1190 312.7   1137    1805
+Waiting:       39 1182 316.0   1137    1805
+Total:         45 1193 312.3   1141    1807
+
+Percentage of the requests served within a certain time (ms)
+  50%   1141
+  66%   1262
+  75%   1403
+  80%   1482
+  90%   1658
+  95%   1726
+  98%   1759
+  99%   1807
+ 100%   1807 (longest request)
+</code></pre>
+
+<p>2、使用opcache</p>
+
+<pre><code>./ab -n 100 -c 100 http://127.0.0.1/phpinfo.php
+ 
+This is ApacheBench, Version 2.3 &lt;$Revision: 655654 $&gt;
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 127.0.0.1 (be patient).....done
+
+Server Software:        nginx
+Server Hostname:        127.0.0.1
+Server Port:            80
+
+Document Path:          /phpinfo.php
+Document Length:        60436 bytes
+
+Concurrency Level:      100
+Time taken for tests:   0.238 seconds
+Complete requests:      100
+Failed requests:        12
+   (Connect: 0, Receive: 0, Length: 12, Exceptions: 0)
+Write errors:           0
+Total transferred:      6058888 bytes
+HTML transferred:       6043588 bytes
+Requests per second:    419.62 [#/sec] (mean)
+Time per request:       238.312 [ms] (mean)
+Time per request:       2.383 [ms] (mean, across all concurrent requests)
+Transfer rate:          24828.30 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    3   0.8      3       5
+Processing:    11  164  70.1    218     228
+Waiting:        5  164  70.3    217     228
+Total:         11  167  69.5    219     231
+
+Percentage of the requests served within a certain time (ms)
+  50%    219
+  66%    224
+  75%    226
+  80%    227
+  90%    229
+  95%    230
+  98%    231
+  99%    231
+ 100%    231 (longest request)
+</code></pre>
+
+<p><strong>结论</strong></p>
+
+<p>使用opcache使php执行效率提高不少。</p>
+
+                </div>
+                
+                <!-- 多说 Share start -->
+                <div class="ds-share"
+                    style="text-align: right"
+                    data-thread-key="/php/2015/08/19/php-opcache"
+                    data-title="php opcache使用"
+                    data-url="http://xpmozong.github.io/php/2015/08/19/php-opcache/"
+                    data-images="http://xpmozong.github.io/img/post-bg-2015.jpg"
+                    data-content="介绍
+
+php opcache的缓存原理，主要是避免php重复编译，减少CPU和内存开销。
+
+安装
+
+到http://pecl.php.net/packa... | 寞踪的博客 | Ellen Blog " >
+                    <div class="ds-share-inline">
+                      <ul  class="ds-share-icons-16">
+                        <li data-toggle="ds-share-icons-more"><a class="ds-more" href="#">分享到：</a></li>
+                        <li><a class="ds-wechat flat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+                        <li><a class="ds-weibo flat" href="javascript:void(0);" data-service="weibo">微博</a></li>
+                        <li><a class="ds-douban flat" href="javascript:void(0);" data-service="douban">豆瓣</a></li>
+                      </ul>
+                      <div class="ds-share-icons-more">
+                      </div>
+                    </div>
+                <hr>
+                </div>
+                <!-- 多说 Share end-->
+                
+                <div class="pager20">
+                    <ul class="pagination clearfix">
+                        
+                        <li class="previous">
+                            <a href="/book/2015/07/03/yitiantulongji/" data-toggle="tooltip" data-placement="top" title="倚天屠龙记读后感">
+                                <i class="fa fa-arrow-circle-o-left"></i> Previous Post
+                            </a>
+                        </li>
+                        
+                        
+                        <li class="next">
+                            <a href="/redis/2015/08/28/redis-jiqun/" data-toggle="tooltip" data-placement="top" title="Redis 集群">
+                                Next Post <i class="fa fa-arrow-circle-o-right"></i>
+                            </a>
+                        </li>
+                        
+                    </ul>
+                </div>
+                
+                <!-- 多说评论框 start -->
+                <div class="comment">
+                    <div class="ds-thread"
+                        data-thread-key="/php/2015/08/19/php-opcache"
+                        data-title="php opcache使用"
+                        data-url="http://xpmozong.github.io/php/2015/08/19/php-opcache/" >
+                    </div>
+                </div>
+                <!-- 多说评论框 end -->
+
+                <!-- Duoshuo hacking -->
+                <input id="dsUser" type="hidden" value="xpmozong"  />
+
+                <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+                <script type="text/javascript">
+                    // dynamic User hacking by Hux
+                    var _user = document.getElementById('dsUser').value;
+                    // duoshuo comment query.
+                    var duoshuoQuery = {short_name: _user };
+                    (function() {
+                        var ds = document.createElement('script');
+                        ds.type = 'text/javascript';ds.async = true;
+                        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+                        ds.charset = 'UTF-8';
+                        (document.getElementsByTagName('head')[0]
+                         || document.getElementsByTagName('body')[0]).appendChild(ds);
+                    })();
+                </script>
+                <!-- 多说公共JS代码 end -->
+                
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Main Container -->
+<p id="back-top"><a href="#top"></a></p>
+<!-- Start Footer -->
+<div class="container zerogrid clearfix">
+    <div id="footer-container" class="wrap-col">
+        <p>Copyrigh &copy; 寞踪的博客 2010-2015</p>
+    </div>
+</div>
+<!-- End Footer -->
+<!-- async load function -->
+<script type="text/javascript">
+    function async(u, c) {
+        var d = document, t = 'script',
+        o = d.createElement(t),
+        s = d.getElementsByTagName(t)[0];
+        o.src = u;
+        if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+        s.parentNode.insertBefore(o, s);
+    }
+
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+    
+    $(function(){
+        var href = location.href;
+        var localh = location.origin+"/";
+        href = href.replace(localh,"");
+        var hrearr = href.split('/');
+        $(".sf-menu li").removeClass('current-menu-item');
+        if (hrearr[0] == 'about') {
+            $("#about").addClass('current-menu-item');
+        }else if(hrearr[0] == 'tags'){
+            $("#tags").addClass('current-menu-item');
+        }else{
+            $("#home").addClass('current-menu-item');
+        }
+
+        $("pre").addClass("prettyprint");
+        prettyPrint();
+
+        // hide #back-top first
+        $("#back-top").hide();
+
+        // fade in #back-top
+        $(function () {
+            $(window).scroll(function () {
+                if ($(this).scrollTop() > 400) {
+                    $('#back-top').fadeIn();
+                } else {
+                    $('#back-top').fadeOut();
+                }
+        });
+
+        // scroll body to 0px on click
+        $('#back-top a').click(function () {
+            $('body,html').animate({
+                scrollTop: 0
+                }, 800);
+            return false;
+            });
+        });
+
+    });
+
+</script>
+</body>
+</html>
+
+
+
+
+
+<!-- BT hacking -->
+<input id="baId" type="hidden" value="6dcc729d6a5d5c61d7c8835eb7418d54"  />
+
+<!-- Baidu Tongji -->
+<script>
+    // dynamic User hacking by Hux
+    var _baId = document.getElementById('baId').value;
+
+    // Originial
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?" + _baId;
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+

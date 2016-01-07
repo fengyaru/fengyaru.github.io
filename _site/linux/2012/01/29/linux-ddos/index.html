@@ -1,0 +1,324 @@
+<!DOCTYPE html lang="en-US">
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="description" content="寞踪的技术博客，主攻PHP，iOS，Python，Linux，C。">
+<meta name="keyword"  content="寞踪的博客">
+<link rel="shortcut icon" href="img/favicon.ico">
+<title>实战DoS Deflate - 寞踪的博客 | Ellen Blog</title>
+<link rel="canonical" href="http://xpmozong.github.io/linux/2012/01/29/linux-ddos/">
+<link href="http://cdn.staticfile.org/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+<link rel='stylesheet' href="/css/style.css" type='text/css' media='all' />
+<link rel='stylesheet' href="/css/color/green.css" type='text/css' media='all' />
+<link href="/google-code-prettify/tomorrow-night-eighties.css" rel="stylesheet" type="text/css" media="all">
+<script src="/google-code-prettify/jquery.js"></script>
+<script src="/google-code-prettify/prettify.js"></script>
+<body class="home blog">
+    <!-- Start Header -->
+    <div class="container zerogrid clearfix">
+        <div class="col-full">
+            <div class="wrap-col">
+                <div id="header-nav-container" class="clearfix">
+                    <div class="h-logo">
+                        <a href="/">
+                            寞踪的博客
+                        </a>
+                    </div>
+                    <div class="h-menu">
+                        <!-- Navigation Menu -->     
+                        <ul class="sf-menu">
+                            <li id="home" class="menu-item current-menu-item">
+                                <a href="/">Home</a>
+                            </li>
+                            <li id="about" class="menu-item">
+                                <a href="/about/">About</a>
+                            </li>
+                            <li id="tags" class="menu-item">
+                                <a href="/tags/">Tags</a>
+                            </li>
+                        </ul> 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<!-- Start Main Container -->
+<div class="container zerogrid">
+    <div class="col-full">
+        <div class="wrap-col page-conainer">
+            <div class="post-margin">
+                <h5 class="page-title">
+                    实战DoS Deflate
+                </h5>
+                
+                <div class="post-subtitle">
+                    
+                </div>
+                
+                <ul class="post-status clearfix">
+                    <li><i class="fa fa-clock-o"></i>January 29, 2012</li>
+                </ul>
+                <div class="post-content">
+                    <p>DDoS deflate是一款免费的用来防御和减轻DDoS攻击的脚本。它通过netstat监测跟踪创建大量网络连接的IP地址，在检测到某个结点超过预设的限 制时，该程序会通过APF或IPTABLES禁止或阻挡这些IP.&lt;/p&gt;</p>
+
+<p>DDoS deflate官方网站：http://deflate.medialayer.com/</p>
+
+<pre><code>netstat -ntu | awk '{print $5}' | cut -d: -f1 | sort | uniq -c | sort -n
+</code></pre>
+
+<p>执行上面的命令后，</p>
+
+<pre><code>1 Address
+1 servers)
+2 123.113.152.60
+4 59.151.36.148
+................................
+</code></pre>
+
+<p>每个IP几个、十几个或几十个连接数都还算比较正常，如果像上面成百上千肯定就不正常了。</p>
+
+<p>好了，下面就安装DDoS deflate吧。</p>
+
+<p>第一步：安装DDoS deflate</p>
+
+<pre><code>wget http://www.inetbase.com/scripts/ddos/install.sh
+chmod 0700 install.sh
+./install.sh    //安装
+</code></pre>
+
+<p>卸载：</p>
+
+<pre><code>wget http://www.inetbase.com/scripts/ddos/uninstall.ddos
+chmod 0700 uninstall.ddos
+./uninstall.ddos
+</code></pre>
+
+<p>第二步：配置DDoS deflate</p>
+
+<p>下面是DDoS deflate的默认配置位于/usr/local/ddos/ddos.conf ，内容如下：</p>
+
+<pre><code>##### Paths of the script and other files
+PROGDIR="/usr/local/ddos"
+PROG="/usr/local/ddos/ddos.sh"
+IGNORE_IP_LIST="/usr/local/ddos/ignore.ip.list"  //IP地址白名单
+CRON="/etc/cron.d/ddos.cron"    //定时执行程序
+APF="/etc/apf/apf"
+IPT="/sbin/iptables"
+
+##### frequency in minutes for running the script
+##### Caution: Every time this setting is changed, run the script with --cron
+#####          option so that the new frequency takes effect
+FREQ=1   //检查时间间隔，默认1分钟
+
+##### How many connections define a bad IP? Indicate that below.
+NO_OF_CONNECTIONS=150     //最大连接数，超过这个数IP就会被屏蔽，一般默认即可
+
+##### APF_BAN=1 (Make sure your APF version is atleast 0.96)
+##### APF_BAN=0 (Uses iptables for banning ips instead of APF)
+APF_BAN=1        //使用APF还是iptables。推荐使用iptables,将APF_BAN的值改为0即可。
+
+##### KILL=0 (Bad IPs are'nt banned, good for interactive execution of script)
+##### KILL=1 (Recommended setting)
+KILL=1   //是否屏蔽IP，默认即可
+
+##### An email is sent to the following address when an IP is banned.
+##### Blank would suppress sending of mails
+EMAIL_TO="root"   //当IP被屏蔽时给指定邮箱发送邮件，推荐使用，换成自己的邮箱即可
+
+##### Number of seconds the banned ip should remain in blacklist.
+BAN_PERIOD=600    //禁用IP时间，默认600秒，可根据情况调整
+</code></pre>
+
+<p>用户可根据给默认配置文件加上的注释提示内容，修改配置文件。</p>
+
+<p>第三步：查看/usr/local/ddos/ddos.sh文件的第117行</p>
+
+<pre><code>netstat -ntu | awk ‘{print $5}’ | cut -d: -f1 | sort | uniq -c | sort -nr &gt; $BAD_IP_LIST
+</code></pre>
+
+<p>修改为以下代码即可！</p>
+
+<pre><code>netstat -ntu | awk ‘{print $5}’ | cut -d: -f1 | sed -n '/[0-9]/p' | sort | uniq -c | sort -nr &gt; $BAD_IP_LIST
+</code></pre>
+
+<p>OK了！</p>
+
+                </div>
+                
+                <!-- 多说 Share start -->
+                <div class="ds-share"
+                    style="text-align: right"
+                    data-thread-key="/linux/2012/01/29/linux-ddos"
+                    data-title="实战DoS Deflate"
+                    data-url="http://xpmozong.github.io/linux/2012/01/29/linux-ddos/"
+                    data-images="http://xpmozong.github.io/img/post-bg-2015.jpg"
+                    data-content="DDoS deflate是一款免费的用来防御和减轻DDoS攻击的脚本。它通过netstat监测跟踪创建大量网络连接的IP地址，在检测到某个结点超过预设的限... | 寞踪的博客 | Ellen Blog " >
+                    <div class="ds-share-inline">
+                      <ul  class="ds-share-icons-16">
+                        <li data-toggle="ds-share-icons-more"><a class="ds-more" href="#">分享到：</a></li>
+                        <li><a class="ds-wechat flat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+                        <li><a class="ds-weibo flat" href="javascript:void(0);" data-service="weibo">微博</a></li>
+                        <li><a class="ds-douban flat" href="javascript:void(0);" data-service="douban">豆瓣</a></li>
+                      </ul>
+                      <div class="ds-share-icons-more">
+                      </div>
+                    </div>
+                <hr>
+                </div>
+                <!-- 多说 Share end-->
+                
+                <div class="pager20">
+                    <ul class="pagination clearfix">
+                        
+                        <li class="previous">
+                            <a href="/php/2012/01/17/php-search-word/" data-toggle="tooltip" data-placement="top" title="php查找一个单词在一个文件中的第几行第几列">
+                                <i class="fa fa-arrow-circle-o-left"></i> Previous Post
+                            </a>
+                        </li>
+                        
+                        
+                        <li class="next">
+                            <a href="/nginx/2012/01/30/nginx/" data-toggle="tooltip" data-placement="top" title="Nginx实现HTTP负载均衡">
+                                Next Post <i class="fa fa-arrow-circle-o-right"></i>
+                            </a>
+                        </li>
+                        
+                    </ul>
+                </div>
+                
+                <!-- 多说评论框 start -->
+                <div class="comment">
+                    <div class="ds-thread"
+                        data-thread-key="/linux/2012/01/29/linux-ddos"
+                        data-title="实战DoS Deflate"
+                        data-url="http://xpmozong.github.io/linux/2012/01/29/linux-ddos/" >
+                    </div>
+                </div>
+                <!-- 多说评论框 end -->
+
+                <!-- Duoshuo hacking -->
+                <input id="dsUser" type="hidden" value="xpmozong"  />
+
+                <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+                <script type="text/javascript">
+                    // dynamic User hacking by Hux
+                    var _user = document.getElementById('dsUser').value;
+                    // duoshuo comment query.
+                    var duoshuoQuery = {short_name: _user };
+                    (function() {
+                        var ds = document.createElement('script');
+                        ds.type = 'text/javascript';ds.async = true;
+                        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+                        ds.charset = 'UTF-8';
+                        (document.getElementsByTagName('head')[0]
+                         || document.getElementsByTagName('body')[0]).appendChild(ds);
+                    })();
+                </script>
+                <!-- 多说公共JS代码 end -->
+                
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Main Container -->
+<p id="back-top"><a href="#top"></a></p>
+<!-- Start Footer -->
+<div class="container zerogrid clearfix">
+    <div id="footer-container" class="wrap-col">
+        <p>Copyrigh &copy; 寞踪的博客 2010-2015</p>
+    </div>
+</div>
+<!-- End Footer -->
+<!-- async load function -->
+<script type="text/javascript">
+    function async(u, c) {
+        var d = document, t = 'script',
+        o = d.createElement(t),
+        s = d.getElementsByTagName(t)[0];
+        o.src = u;
+        if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+        s.parentNode.insertBefore(o, s);
+    }
+
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+    
+    $(function(){
+        var href = location.href;
+        var localh = location.origin+"/";
+        href = href.replace(localh,"");
+        var hrearr = href.split('/');
+        $(".sf-menu li").removeClass('current-menu-item');
+        if (hrearr[0] == 'about') {
+            $("#about").addClass('current-menu-item');
+        }else if(hrearr[0] == 'tags'){
+            $("#tags").addClass('current-menu-item');
+        }else{
+            $("#home").addClass('current-menu-item');
+        }
+
+        $("pre").addClass("prettyprint");
+        prettyPrint();
+
+        // hide #back-top first
+        $("#back-top").hide();
+
+        // fade in #back-top
+        $(function () {
+            $(window).scroll(function () {
+                if ($(this).scrollTop() > 400) {
+                    $('#back-top').fadeIn();
+                } else {
+                    $('#back-top').fadeOut();
+                }
+        });
+
+        // scroll body to 0px on click
+        $('#back-top a').click(function () {
+            $('body,html').animate({
+                scrollTop: 0
+                }, 800);
+            return false;
+            });
+        });
+
+    });
+
+</script>
+</body>
+</html>
+
+
+
+
+
+<!-- BT hacking -->
+<input id="baId" type="hidden" value="6dcc729d6a5d5c61d7c8835eb7418d54"  />
+
+<!-- Baidu Tongji -->
+<script>
+    // dynamic User hacking by Hux
+    var _baId = document.getElementById('baId').value;
+
+    // Originial
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?" + _baId;
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+

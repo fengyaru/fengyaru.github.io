@@ -1,0 +1,518 @@
+<!DOCTYPE html lang="en-US">
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="description" content="寞踪的技术博客，主攻PHP，iOS，Python，Linux，C。">
+<meta name="keyword"  content="寞踪的博客">
+<link rel="shortcut icon" href="img/favicon.ico">
+<title>linux 小总结 - 寞踪的博客 | Ellen Blog</title>
+<link rel="canonical" href="http://xpmozong.github.io/linux/2013/11/29/linux-summary/">
+<link href="http://cdn.staticfile.org/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+<link rel='stylesheet' href="/css/style.css" type='text/css' media='all' />
+<link rel='stylesheet' href="/css/color/green.css" type='text/css' media='all' />
+<link href="/google-code-prettify/tomorrow-night-eighties.css" rel="stylesheet" type="text/css" media="all">
+<script src="/google-code-prettify/jquery.js"></script>
+<script src="/google-code-prettify/prettify.js"></script>
+<body class="home blog">
+    <!-- Start Header -->
+    <div class="container zerogrid clearfix">
+        <div class="col-full">
+            <div class="wrap-col">
+                <div id="header-nav-container" class="clearfix">
+                    <div class="h-logo">
+                        <a href="/">
+                            寞踪的博客
+                        </a>
+                    </div>
+                    <div class="h-menu">
+                        <!-- Navigation Menu -->     
+                        <ul class="sf-menu">
+                            <li id="home" class="menu-item current-menu-item">
+                                <a href="/">Home</a>
+                            </li>
+                            <li id="about" class="menu-item">
+                                <a href="/about/">About</a>
+                            </li>
+                            <li id="tags" class="menu-item">
+                                <a href="/tags/">Tags</a>
+                            </li>
+                        </ul> 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<!-- Start Main Container -->
+<div class="container zerogrid">
+    <div class="col-full">
+        <div class="wrap-col page-conainer">
+            <div class="post-margin">
+                <h5 class="page-title">
+                    linux 小总结
+                </h5>
+                
+                <div class="post-subtitle">
+                    
+                </div>
+                
+                <ul class="post-status clearfix">
+                    <li><i class="fa fa-clock-o"></i>November 29, 2013</li>
+                </ul>
+                <div class="post-content">
+                    <p>1、初始安装</p>
+
+<pre><code>yum install make apr* autoconf automake gcc gcc-c++ openssl openssl-devel pcre-devel gd  kernel keyutils perl kernel-headers compat* mpfr cpp glibc libgomp libstdc++-devel ppl cloog-ppl keyutils-libs-devel libcom_err-devel libsepol-devel libselinux-devel krb5-devel zlib-devel libXpm* freetype libjpeg* libpng* ncurses* libtool* libxml2 libxml2-devel patch
+</code></pre>
+
+<p>2、日志20行</p>
+
+<pre><code>cat error.log | awk '{print $1}'|sort|uniq -c|sort -nr|head -20
+</code></pre>
+
+<p>3、运行C程序</p>
+
+<pre><code>yum -y install gcc
+yum -y install gcc-c++ 
+yum install make
+// 编译 
+gcc hello.c -o hello
+</code></pre>
+
+<p>4、加全局变量</p>
+
+<pre><code>编辑： vim /root/.bash_profile
+添加： export PATH=$PATH:/usr/local/go/bin
+运行： source /root/.bash_profile
+可以通过 echo $PATH 来查看环境变量
+vim .bashrc
+source .bashrc
+</code></pre>
+
+<p>5、Centos查看端口占用情况命令，比如查看80端口占用情况使用如下命令：</p>
+
+<pre><code>lsof -i tcp:80
+</code></pre>
+
+<p>6、列出所有端口</p>
+
+<pre><code>netstat -ntlp
+</code></pre>
+
+<p>7、查看进程</p>
+
+<pre><code>ps -ef | grep nginx
+</code></pre>
+
+<p>8、按照这个步骤启动uwsgi</p>
+
+<pre><code>ps aux | grep uwsgi
+pkill uwsg
+screen
+uwsgi -x /data/funny/uwsgi.xml
+chown -R www:www /tmp/funny.sock
+</code></pre>
+
+<p>9、列出文件夹下文件夹大小</p>
+
+<pre><code>du -sh /data/*  
+</code></pre>
+
+<p>10、定时执行修改</p>
+
+<pre><code>crontab -e
+/etc/init.d/crond restart
+</code></pre>
+
+<p>11、复制</p>
+
+<pre><code>// 复制指定目录的文件到当前目录，并重命名
+cp ~/.bashrc bashrc_bak
+
+// 强制复制指定目录的文件到当前目录，而不管当前目录是否含有该文件
+cp -f ~/.bashrc bashrc
+
+// 复制指定目录到当前目录
+cp -r /root/test .
+cp -r /root/test/ .
+
+// 复制指定目录的文件到指定目录
+cp ~/.bashrc /bak/.bashrc
+// 若提示：
+cp: omitting directory
+// 则采用：
+cp -r ~/.bashrc /bak/.bashrc
+// 若提示：
+cp:overwrite
+// 则采用加斜杠：
+/cp -r -f ~/.bashrc /bak/.bashrc
+
+// 在复制时将源文件的全部属性也复制过来。若不指定参数，则目标文件与源文件属性可能不一致。
+cp -a ~/.bashrc /bak/.bashrc
+
+// 若两个文件夹要保证同步，一个文件的改了，另一个文件也跟着改，但是要保证两个文件的文件都是最新的。
+cp -u /src/.bashrc /bak_src/bashrc
+</code></pre>
+
+<p>12、重命名文件夹</p>
+
+<pre><code>mv oldfilename newfilename
+</code></pre>
+
+<p>13、防火墙</p>
+
+<pre><code>// 关闭
+/etc/init.d/iptables stop
+// 添加例外端口 
+vim /etc/sysconfig/iptables
+-A INPUT -p tcp -m tcp --dport 55 -j ACCEPT
+</code></pre>
+
+<p>14、查找文件</p>
+
+<pre><code>find / -name access_log
+</code></pre>
+
+<p>15、网桥</p>
+
+<pre><code>brctl show
+</code></pre>
+
+<p>16、noVNC</p>
+
+<pre><code>yum install python-devel
+nohup /data/noVNC/utils/launch.sh &amp;
+// 普通访问
+/data/noVNC/utils/websockify.py -D 8000 192.168.1.1:5900
+http://192.168.1.1:6080/vnc_auto.html?host=192.168.1.1&amp;port=8000
+// proxy访问
+/data/noVNC/utils/websockify --target-config=/data/noVNC/vnc_tokens 29876
+http://192.168.1.1:6080/vnc_auto.html?host=192.168.1.1&amp;port=29876&amp;token=212oukhdvszujihzqvm
+</code></pre>
+
+<p>17、virsh、qemu命令</p>
+
+<pre><code>// 远程连接
+virsh -c qemu+tls://192.168.1.1:23/system list --all
+// 创建磁盘
+qemu-img create -f qcow2 -o preallocation=metadata /data/vm/test2.qcow2 8G
+// 编辑虚拟机文件
+virt-edit -d 912-2 /root/meta.js
+// 挂载虚拟机磁盘
+guestmount --rw -a /data/qyinstances/instance-11354/disk.qcow2 -m /dev/sda1 /mnt/qyvms/
+
+fusermount -u /mnt/tmp1
+</code></pre>
+
+<p>18、将文件转成镜像</p>
+
+<pre><code>mkisofs -r -o meta.iso meta.js
+</code></pre>
+
+<p>19、挂载文件</p>
+
+<pre><code>mount /dev/sr0 /media/
+</code></pre>
+
+<p>20、查看硬盘还剩多少容量</p>
+
+<pre><code>df -h
+fdisk -l
+</code></pre>
+
+<p>21、获取IP地址</p>
+
+<pre><code>dhclient -d eth0
+</code></pre>
+
+<p>22、随机生成mac地址</p>
+
+<pre><code>MACADDR="52:54:$(dd if=/dev/urandom count=1 2&gt;/dev/null | md5sum | sed 's/^\(..\)\(..\)\(..\)\(..\).*$/\1:\2:\3:\4/')"; echo $MACADDR
+</code></pre>
+
+<p>23、更改文件或文件夹所属</p>
+
+<pre><code>chown qemu.qemu /dev/kvm
+</code></pre>
+
+<p>24、修改ip</p>
+
+<pre><code>vim /etc/sysconfig/network-scripts/ifcfg-em1
+</code></pre>
+
+<p>25、查看网线有没有连接</p>
+
+<pre><code>mii-tool em2
+</code></pre>
+
+<p>26、获得掩码</p>
+
+<pre><code>cat /etc/sysconfig/network-scripts/ifcfg-public | grep -i netmask  
+</code></pre>
+
+<p>27、获得网关</p>
+
+<pre><code>route -n | awk '{print $2}' | tail -1
+</code></pre>
+
+<p>28、salt学习</p>
+
+<pre><code>salt-key -L
+salt-key -d opstest
+salt "*" grains.items
+salt "*" grains.item id
+salt "*" grains.item ipv4
+// 分发文件 
+salt 'hadoop1' cp.get_file salt://test.txt /data/test.txt
+</code></pre>
+
+<p>29、SCP</p>
+
+<pre><code>// 从本地复制到远程
+scp -P 22 /data/iso/test.txt admin@192.168.1.1:/data/iso/
+// 从远程复制到本地
+scp -P 22 root@192.168.1.1:/data/vm/test.txt /data/iso/test.txt
+</code></pre>
+
+<p>30、判断一文件是否存在</p>
+
+<pre><code>test -f /data/iso/centos6.3.qcow2;echo $?
+// 0为有文件，其他为无文件
+</code></pre>
+
+<p>31、ssh 登录</p>
+
+<pre><code>ssh -p 22 -i id_rsa admin@192.168.1.1
+</code></pre>
+
+<p>32、rpm删不掉的话 用这个</p>
+
+<pre><code>rpm -e opennebula-sunstone-4.0.0-1.x86_64 --noscripts
+</code></pre>
+
+<p>33、添加用户并登陆</p>
+
+<pre><code>useradd opsvmadmin
+groupadd opsvmadmin
+usermod -a -G opsvmadmin opsvmadmin
+vim /etc/ssh/sshd_config
+// 加入 AllowGroups opsvmadmin
+/etc/init.d/sshd restart
+</code></pre>
+
+<p>34、检测某段内ip是否可用</p>
+
+<pre><code>fping -t 500 -g  192.168.1.1 192.168.1.128
+</code></pre>
+
+<p>35、ll 不可用的时候</p>
+
+<pre><code>vim ~/.bashrc  alias ll='ls -l --color=auto'
+</code></pre>
+
+<p>36、看某个文件逐渐增加的</p>
+
+<pre><code>watch "ls -l"
+</code></pre>
+
+<p>37、打包</p>
+
+<pre><code>tar zcvf noVNC.tar.gz noVNC/
+</code></pre>
+
+<p>38、证书使用包</p>
+
+<pre><code>yum install -y gnutls-utils
+</code></pre>
+
+<p>39、查看iptables 列表</p>
+
+<pre><code>iptables -L -n
+</code></pre>
+
+<p>40、输出CPU使用率、输出内存使用率</p>
+
+<pre><code>cat /proc/stat | grep cpu | head -1 | awk '{sum=$2+$3+$4+$5+$6+$7+$8;use=$2+$3+$4+$6+$7+$8;printf "%s\t%.2f%%\n",$1,(use*100/sum)}'
+free | grep Mem: | awk '{use=$3-$6-$7;printf "%s\t%.2f%%\n",$1,(use*100/$2)}'
+</code></pre>
+
+                </div>
+                
+                <!-- 多说 Share start -->
+                <div class="ds-share"
+                    style="text-align: right"
+                    data-thread-key="/linux/2013/11/29/linux-summary"
+                    data-title="linux 小总结"
+                    data-url="http://xpmozong.github.io/linux/2013/11/29/linux-summary/"
+                    data-images="http://xpmozong.github.io/img/post-bg-2015.jpg"
+                    data-content="1、初始安装
+
+yum install make apr* autoconf automake gcc gcc-c++ openssl openssl-d... | 寞踪的博客 | Ellen Blog " >
+                    <div class="ds-share-inline">
+                      <ul  class="ds-share-icons-16">
+                        <li data-toggle="ds-share-icons-more"><a class="ds-more" href="#">分享到：</a></li>
+                        <li><a class="ds-wechat flat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+                        <li><a class="ds-weibo flat" href="javascript:void(0);" data-service="weibo">微博</a></li>
+                        <li><a class="ds-douban flat" href="javascript:void(0);" data-service="douban">豆瓣</a></li>
+                      </ul>
+                      <div class="ds-share-icons-more">
+                      </div>
+                    </div>
+                <hr>
+                </div>
+                <!-- 多说 Share end-->
+                
+                <div class="pager20">
+                    <ul class="pagination clearfix">
+                        
+                        <li class="previous">
+                            <a href="/mysql/2013/11/28/mysql-summary/" data-toggle="tooltip" data-placement="top" title="mysql 小总结">
+                                <i class="fa fa-arrow-circle-o-left"></i> Previous Post
+                            </a>
+                        </li>
+                        
+                        
+                        <li class="next">
+                            <a href="/php/2013/12/05/lnmp/" data-toggle="tooltip" data-placement="top" title="Linux + Nginx + Mysql + PHP 编译安装">
+                                Next Post <i class="fa fa-arrow-circle-o-right"></i>
+                            </a>
+                        </li>
+                        
+                    </ul>
+                </div>
+                
+                <!-- 多说评论框 start -->
+                <div class="comment">
+                    <div class="ds-thread"
+                        data-thread-key="/linux/2013/11/29/linux-summary"
+                        data-title="linux 小总结"
+                        data-url="http://xpmozong.github.io/linux/2013/11/29/linux-summary/" >
+                    </div>
+                </div>
+                <!-- 多说评论框 end -->
+
+                <!-- Duoshuo hacking -->
+                <input id="dsUser" type="hidden" value="xpmozong"  />
+
+                <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+                <script type="text/javascript">
+                    // dynamic User hacking by Hux
+                    var _user = document.getElementById('dsUser').value;
+                    // duoshuo comment query.
+                    var duoshuoQuery = {short_name: _user };
+                    (function() {
+                        var ds = document.createElement('script');
+                        ds.type = 'text/javascript';ds.async = true;
+                        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+                        ds.charset = 'UTF-8';
+                        (document.getElementsByTagName('head')[0]
+                         || document.getElementsByTagName('body')[0]).appendChild(ds);
+                    })();
+                </script>
+                <!-- 多说公共JS代码 end -->
+                
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Main Container -->
+<p id="back-top"><a href="#top"></a></p>
+<!-- Start Footer -->
+<div class="container zerogrid clearfix">
+    <div id="footer-container" class="wrap-col">
+        <p>Copyrigh &copy; 寞踪的博客 2010-2015</p>
+    </div>
+</div>
+<!-- End Footer -->
+<!-- async load function -->
+<script type="text/javascript">
+    function async(u, c) {
+        var d = document, t = 'script',
+        o = d.createElement(t),
+        s = d.getElementsByTagName(t)[0];
+        o.src = u;
+        if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+        s.parentNode.insertBefore(o, s);
+    }
+
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+    
+    $(function(){
+        var href = location.href;
+        var localh = location.origin+"/";
+        href = href.replace(localh,"");
+        var hrearr = href.split('/');
+        $(".sf-menu li").removeClass('current-menu-item');
+        if (hrearr[0] == 'about') {
+            $("#about").addClass('current-menu-item');
+        }else if(hrearr[0] == 'tags'){
+            $("#tags").addClass('current-menu-item');
+        }else{
+            $("#home").addClass('current-menu-item');
+        }
+
+        $("pre").addClass("prettyprint");
+        prettyPrint();
+
+        // hide #back-top first
+        $("#back-top").hide();
+
+        // fade in #back-top
+        $(function () {
+            $(window).scroll(function () {
+                if ($(this).scrollTop() > 400) {
+                    $('#back-top').fadeIn();
+                } else {
+                    $('#back-top').fadeOut();
+                }
+        });
+
+        // scroll body to 0px on click
+        $('#back-top a').click(function () {
+            $('body,html').animate({
+                scrollTop: 0
+                }, 800);
+            return false;
+            });
+        });
+
+    });
+
+</script>
+</body>
+</html>
+
+
+
+
+
+<!-- BT hacking -->
+<input id="baId" type="hidden" value="6dcc729d6a5d5c61d7c8835eb7418d54"  />
+
+<!-- Baidu Tongji -->
+<script>
+    // dynamic User hacking by Hux
+    var _baId = document.getElementById('baId').value;
+
+    // Originial
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?" + _baId;
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+

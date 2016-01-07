@@ -1,0 +1,323 @@
+<!DOCTYPE html lang="en-US">
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="description" content="寞踪的技术博客，主攻PHP，iOS，Python，Linux，C。">
+<meta name="keyword"  content="寞踪的博客">
+<link rel="shortcut icon" href="img/favicon.ico">
+<title>Windows下安装配置PHP Memcached - 寞踪的博客 | Ellen Blog</title>
+<link rel="canonical" href="http://xpmozong.github.io/php/2013/07/09/php-memcached/">
+<link href="http://cdn.staticfile.org/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+<link rel='stylesheet' href="/css/style.css" type='text/css' media='all' />
+<link rel='stylesheet' href="/css/color/green.css" type='text/css' media='all' />
+<link href="/google-code-prettify/tomorrow-night-eighties.css" rel="stylesheet" type="text/css" media="all">
+<script src="/google-code-prettify/jquery.js"></script>
+<script src="/google-code-prettify/prettify.js"></script>
+<body class="home blog">
+    <!-- Start Header -->
+    <div class="container zerogrid clearfix">
+        <div class="col-full">
+            <div class="wrap-col">
+                <div id="header-nav-container" class="clearfix">
+                    <div class="h-logo">
+                        <a href="/">
+                            寞踪的博客
+                        </a>
+                    </div>
+                    <div class="h-menu">
+                        <!-- Navigation Menu -->     
+                        <ul class="sf-menu">
+                            <li id="home" class="menu-item current-menu-item">
+                                <a href="/">Home</a>
+                            </li>
+                            <li id="about" class="menu-item">
+                                <a href="/about/">About</a>
+                            </li>
+                            <li id="tags" class="menu-item">
+                                <a href="/tags/">Tags</a>
+                            </li>
+                        </ul> 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<!-- Start Main Container -->
+<div class="container zerogrid">
+    <div class="col-full">
+        <div class="wrap-col page-conainer">
+            <div class="post-margin">
+                <h5 class="page-title">
+                    Windows下安装配置PHP Memcached
+                </h5>
+                
+                <ul class="post-status clearfix">
+                    <li><i class="fa fa-clock-o"></i>July 9, 2013</li>
+                </ul>
+                <div class="post-content">
+                    <p>安装前准备：</p>
+
+<ol>
+  <li>
+    <p>memcached 1.2.1 for Win32 binaries，这个是 Win32 服务器端的 memcached 最新版本，下载<a href="http://code.jellycan.com/files/memcached-1.2.6-win32-bin.zip">附件</a></p>
+  </li>
+  <li>
+    <p>php 所需的 PECL 扩展，即 php_memcache 扩展 http://windows.php.net/downloads/pecl/releases/memcache/2.2.7/</p>
+  </li>
+</ol>
+
+<p>win7 64 位</p>
+
+<p>php-5.3.4-x64 php_memcache.dll <a href="http://blog.hexu.org/wp-content/uploads/2012/05/php_memcache.zip">下载</a></p>
+
+<p>Memcache-win64 下载：</p>
+
+<p>a. 下载最新版：http://blog.couchbase.com/memcached-windows-64-bit-pre-release-available</p>
+
+<p>b. 直接下载： http://s3.amazonaws.com/downloads.northscale.com/memcached-win64-1.4.4-14.zip</p>
+
+<p>安装步骤：</p>
+
+<ol>
+  <li>
+    <p>将第一个包解压放某个盘下面，比如在c:\memcached</p>
+  </li>
+  <li>
+    <p>在终端下输入 ‘c:\memcached\memcached.exe -d install’ , memcached将作为windows的一个服务</p>
+  </li>
+  <li>
+    <p>再输入 ‘c:\memcached\memcached.exe -d start’ , 这样服务器端已经安装完毕了</p>
+  </li>
+  <li>
+    <p>解压第二个包包，里面会只有一个 php_memcache.dll 文件，把它放入 php5/ext/ 中</p>
+  </li>
+  <li>
+    <p>在C:\WINDOWS\php.ini 加入一行’extension=php_memcache.dll’</p>
+  </li>
+</ol>
+
+<p>6.接着在 php.ini 文件里加上以下带代码，最好就放在刚才写 “extension=php_memcache.dll” 的下面:</p>
+
+<pre><code>[Memcache]
+memcache.allow_failover = 1
+memcache.max_failover_attempts=20
+memcache.chunk_size =8192
+memcache.default_port = 11211
+</code></pre>
+
+<p>试运行：</p>
+
+<p>写一个 test.php 文件：（更多使用方法可以参看 PHP 手册里的 Memcache Functions 使用说明）</p>
+
+<p>复制代码 代码如下:</p>
+
+<pre><code>header('Content-Type:text/html;charset=utf-8');
+$memcache = new Memcache;
+$memcache-&gt;connect('localhost', 11211) or die ("Could not connect");
+
+$version = $memcache-&gt;getVersion();
+echo "Server's version: ".$version."&lt;br/&gt;\n";
+
+$tmp_object = new stdClass;
+$tmp_object-&gt;str_attr = 'test';
+$tmp_object-&gt;int_attr = 123;
+
+$memcache-&gt;set('key', $tmp_object, false, 10) or die ("Failed to save data at the server");
+echo "Store data in the cache (data will expire in 10 seconds)&lt;br/&gt;\n";
+
+$get_result = $memcache-&gt;get('key');
+echo "Data from the cache:&lt;br/&gt;\n";
+print_r($get_result);
+</code></pre>
+
+<p>如果有输出：</p>
+
+<pre><code>Server's version: 1.2.6
+Store data in the cache (data will expire in 10 seconds)
+Data from the cache:
+stdClass Object ( [str_attr] =&gt; test [int_attr] =&gt; 123 ) 
+</code></pre>
+
+                </div>
+                
+                <!-- 多说 Share start -->
+                <div class="ds-share"
+                    style="text-align: right"
+                    data-thread-key="/php/2013/07/09/php-memcached"
+                    data-title="Windows下安装配置PHP Memcached"
+                    data-url="http://xpmozong.github.io/php/2013/07/09/php-memcached/"
+                    data-images="http://xpmozong.github.io/img/home-bg.jpg"
+                    data-content="安装前准备：
+
+
+  
+    memcached 1.2.1 for Win32 binaries，这个是 Win32 服务器端的 memcached ... | 寞踪的博客 | Ellen Blog " >
+                    <div class="ds-share-inline">
+                      <ul  class="ds-share-icons-16">
+                        <li data-toggle="ds-share-icons-more"><a class="ds-more" href="#">分享到：</a></li>
+                        <li><a class="ds-wechat flat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+                        <li><a class="ds-weibo flat" href="javascript:void(0);" data-service="weibo">微博</a></li>
+                        <li><a class="ds-douban flat" href="javascript:void(0);" data-service="douban">豆瓣</a></li>
+                      </ul>
+                      <div class="ds-share-icons-more">
+                      </div>
+                    </div>
+                <hr>
+                </div>
+                <!-- 多说 Share end-->
+                
+                <div class="pager20">
+                    <ul class="pagination clearfix">
+                        
+                        <li class="previous">
+                            <a href="/nginx/2013/05/10/crontab/" data-toggle="tooltip" data-placement="top" title="crontab 定时执行某个域名">
+                                <i class="fa fa-arrow-circle-o-left"></i> Previous Post
+                            </a>
+                        </li>
+                        
+                        
+                        <li class="next">
+                            <a href="/php/2013/08/09/php-libvirt/" data-toggle="tooltip" data-placement="top" title="libvirt-php 学习小记">
+                                Next Post <i class="fa fa-arrow-circle-o-right"></i>
+                            </a>
+                        </li>
+                        
+                    </ul>
+                </div>
+                
+                <!-- 多说评论框 start -->
+                <div class="comment">
+                    <div class="ds-thread"
+                        data-thread-key="/php/2013/07/09/php-memcached"
+                        data-title="Windows下安装配置PHP Memcached"
+                        data-url="http://xpmozong.github.io/php/2013/07/09/php-memcached/" >
+                    </div>
+                </div>
+                <!-- 多说评论框 end -->
+
+                <!-- Duoshuo hacking -->
+                <input id="dsUser" type="hidden" value="xpmozong"  />
+
+                <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+                <script type="text/javascript">
+                    // dynamic User hacking by Hux
+                    var _user = document.getElementById('dsUser').value;
+                    // duoshuo comment query.
+                    var duoshuoQuery = {short_name: _user };
+                    (function() {
+                        var ds = document.createElement('script');
+                        ds.type = 'text/javascript';ds.async = true;
+                        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+                        ds.charset = 'UTF-8';
+                        (document.getElementsByTagName('head')[0]
+                         || document.getElementsByTagName('body')[0]).appendChild(ds);
+                    })();
+                </script>
+                <!-- 多说公共JS代码 end -->
+                
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Main Container -->
+<p id="back-top"><a href="#top"></a></p>
+<!-- Start Footer -->
+<div class="container zerogrid clearfix">
+    <div id="footer-container" class="wrap-col">
+        <p>Copyrigh &copy; 寞踪的博客 2010-2015</p>
+    </div>
+</div>
+<!-- End Footer -->
+<!-- async load function -->
+<script type="text/javascript">
+    function async(u, c) {
+        var d = document, t = 'script',
+        o = d.createElement(t),
+        s = d.getElementsByTagName(t)[0];
+        o.src = u;
+        if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+        s.parentNode.insertBefore(o, s);
+    }
+
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+    
+    $(function(){
+        var href = location.href;
+        var localh = location.origin+"/";
+        href = href.replace(localh,"");
+        var hrearr = href.split('/');
+        $(".sf-menu li").removeClass('current-menu-item');
+        if (hrearr[0] == 'about') {
+            $("#about").addClass('current-menu-item');
+        }else if(hrearr[0] == 'tags'){
+            $("#tags").addClass('current-menu-item');
+        }else{
+            $("#home").addClass('current-menu-item');
+        }
+
+        $("pre").addClass("prettyprint");
+        prettyPrint();
+
+        // hide #back-top first
+        $("#back-top").hide();
+
+        // fade in #back-top
+        $(function () {
+            $(window).scroll(function () {
+                if ($(this).scrollTop() > 400) {
+                    $('#back-top').fadeIn();
+                } else {
+                    $('#back-top').fadeOut();
+                }
+        });
+
+        // scroll body to 0px on click
+        $('#back-top a').click(function () {
+            $('body,html').animate({
+                scrollTop: 0
+                }, 800);
+            return false;
+            });
+        });
+
+    });
+
+</script>
+</body>
+</html>
+
+
+
+
+
+<!-- BT hacking -->
+<input id="baId" type="hidden" value="6dcc729d6a5d5c61d7c8835eb7418d54"  />
+
+<!-- Baidu Tongji -->
+<script>
+    // dynamic User hacking by Hux
+    var _baId = document.getElementById('baId').value;
+
+    // Originial
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?" + _baId;
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+

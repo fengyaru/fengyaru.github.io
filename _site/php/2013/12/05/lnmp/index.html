@@ -1,0 +1,607 @@
+<!DOCTYPE html lang="en-US">
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="description" content="寞踪的技术博客，主攻PHP，iOS，Python，Linux，C。">
+<meta name="keyword"  content="寞踪的博客">
+<link rel="shortcut icon" href="img/favicon.ico">
+<title>Linux + Nginx + Mysql + PHP 编译安装 - 寞踪的博客 | Ellen Blog</title>
+<link rel="canonical" href="http://xpmozong.github.io/php/2013/12/05/lnmp/">
+<link href="http://cdn.staticfile.org/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+<link rel='stylesheet' href="/css/style.css" type='text/css' media='all' />
+<link rel='stylesheet' href="/css/color/green.css" type='text/css' media='all' />
+<link href="/google-code-prettify/tomorrow-night-eighties.css" rel="stylesheet" type="text/css" media="all">
+<script src="/google-code-prettify/jquery.js"></script>
+<script src="/google-code-prettify/prettify.js"></script>
+<body class="home blog">
+    <!-- Start Header -->
+    <div class="container zerogrid clearfix">
+        <div class="col-full">
+            <div class="wrap-col">
+                <div id="header-nav-container" class="clearfix">
+                    <div class="h-logo">
+                        <a href="/">
+                            寞踪的博客
+                        </a>
+                    </div>
+                    <div class="h-menu">
+                        <!-- Navigation Menu -->     
+                        <ul class="sf-menu">
+                            <li id="home" class="menu-item current-menu-item">
+                                <a href="/">Home</a>
+                            </li>
+                            <li id="about" class="menu-item">
+                                <a href="/about/">About</a>
+                            </li>
+                            <li id="tags" class="menu-item">
+                                <a href="/tags/">Tags</a>
+                            </li>
+                        </ul> 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<!-- Start Main Container -->
+<div class="container zerogrid">
+    <div class="col-full">
+        <div class="wrap-col page-conainer">
+            <div class="post-margin">
+                <h5 class="page-title">
+                    Linux + Nginx + Mysql + PHP 编译安装
+                </h5>
+                
+                <div class="post-subtitle">
+                    
+                </div>
+                
+                <ul class="post-status clearfix">
+                    <li><i class="fa fa-clock-o"></i>December 5, 2013</li>
+                </ul>
+                <div class="post-content">
+                    <p>首先准备安装包</p>
+
+<pre><code>nginx-1.0.15.tar.gz
+php-5.3.16.tar.gz
+libaio-0.3.93-4.i386.rpm
+MySQL-server-5.5.14-1.rhel5.x64.rpm
+MySQL-client-5.5.14-1.rhel5.x64.rpm
+MySQL-shared-5.5.14-1.rhel5.x64.rpm
+MySQL-devel-5.5.14-1.rhel5.x64.rpm
+libmcrypt-2.5.7.tar.gz
+mhash-0.9.9.9.tar.gz
+mcrypt-2.6.8.tar.gz
+pcre-8.33.tar.gz
+</code></pre>
+
+<p>先yum一些必要的</p>
+
+<pre><code>yum -y install gcc-c++ openssl-devel libjpeg-devel libpng-devel libXpm-devel ImageMagick ImageMagick-devel freetype freetype-devel curl-devel
+</code></pre>
+
+<p>然后安装各个库，依次是libmcrypt，mhash， mcrypt 和pcre</p>
+
+<pre><code>tar zxvf libmcrypt-2.5.8.tar.gz
+cd libmcrypt-2.5.8/
+./configure
+make
+make install
+/sbin/ldconfig
+cd libltdl/
+./configure --enable-ltdl-install
+make
+make install
+cd ../../
+
+tar zxvf mhash-0.9.9.9.tar.gz
+cd mhash-0.9.9.9/
+./configure
+make
+make install
+cd ../
+ 
+ln -s /usr/local/lib/libmcrypt.la /usr/lib/libmcrypt.la
+ln -s /usr/local/lib/libmcrypt.so /usr/lib/libmcrypt.so
+ln -s /usr/local/lib/libmcrypt.so.4 /usr/lib/libmcrypt.so.4
+ln -s /usr/local/lib/libmcrypt.so.4.4.8 /usr/lib/libmcrypt.so.4.4.8
+ln -s /usr/local/lib/libmhash.a /usr/lib/libmhash.a
+ln -s /usr/local/lib/libmhash.la /usr/lib/libmhash.la
+ln -s /usr/local/lib/libmhash.so /usr/lib/libmhash.so
+ln -s /usr/local/lib/libmhash.so.2 /usr/lib/libmhash.so.2
+ln -s /usr/local/lib/libmhash.so.2.0.1 /usr/lib/libmhash.so.2.0.1
+
+tar zxvf mcrypt-2.6.8.tar.gz
+cd mcrypt-2.6.8/
+/sbin/ldconfig
+./configure
+make
+make install
+cd ../
+
+tar zxvf pcre-8.33.tar.gz
+cd pcre-8.30
+./configure
+make
+make install
+cd ../
+</code></pre>
+
+<p>一、安装MySQL</p>
+
+<pre><code>rpm -ivh libaio-0.3.93-4.x64.rpm
+rpm -ivh MySQL-server-5.5.14-1.rhel5.x64.rpm
+rpm -ivh MySQL-client-5.5.14-1.rhel5.x64.rpm
+rpm -ivh MySQL-shared-5.5.14-1.rhel5.x64.rpm
+rpm -ivh MySQL-devel-5.5.14-1.rhel5.x64.rpm
+
+service mysql start
+//修改密码
+mysql_secure_installation
+</code></pre>
+
+<p>二、安装PHP</p>
+
+<pre><code>tar zxvf php-5.3.16.tar.gz
+cd php-5.3.16
+mkdir -p /usr/local/php
+// 很多的模块
+./configure --prefix=/usr/local/php --with-config-file-path=/usr/local/php/etc --with-mysql=/usr/bin/ --with-libdir=lib64 --with-mysqli=/usr/bin/mysql_config --with-iconv-dir=/usr/local --with-freetype-dir --with-jpeg-dir --with-png-dir --with-zlib --with-libxml-dir=/usr --enable-xml --disable-rpath --enable-safe-mode --enable-bcmath --enable-shmop --enable-sysvsem --enable-inline-optimization --with-curl --with-curlwrappers --enable-mbregex --enable-fpm --enable-mbstring --with-mcrypt --with-gd --enable-gd-native-ttf --with-openssl --with-mhash --enable-pcntl --enable-sockets  --with-xmlrpc --enable-zip --enable-soap --with-pdo-mysql=/usr/bin/mysql --with-mysql-sock=/var/lib/mysql/mysql.sock
+// 简单的模块
+./configure --prefix=/usr/local/php --with-config-file-path=/usr/local/php/etc --with-mysql=/usr/bin/ --with-libdir=lib64 --enable-xml --enable-zip --enable-fpm --enable-mbstring --with-gd --with-zlib --with-curl --with-pdo-mysql=/usr/bin/mysql --with-mysql-sock=/var/lib/mysql/mysql.sock
+
+// 如果有这个错误
+configure: error: Cannot find libmysqlclient under /usr.
+Note that the MySQL client library is not bundled anymore!
+// 就加上
+--with-libdir=lib64
+
+make
+make install
+
+cp php.ini-production /usr/local/php/etc/php.ini
+cp sapi/fpm/init.d.php-fpm /etc/init.d/php-fpm #因为php5.3开始自带fpm，使用自带的管理脚本
+chmod +x /etc/init.d/php-fpm
+chkconfig php-fpm on #设置开机自启动
+cp /usr/local/php/etc/php-fpm.conf.default /usr/local/php/etc/php-fpm.conf
+
+// 然后修改php-fpm.conf，将pid改成以下，并将user和group改成www
+pid = run/php-fpm.pid
+user = www
+group = www
+</code></pre>
+
+<p>三、安装NGINX</p>
+
+<pre><code>groupadd www
+useradd -s /sbin/nologin -g www www #www用户不能login
+mkdir -p /home/www #此路径是用于存放各域名的root路径
+chmod +w /home/www
+mkdir -p /home/wwwlogs
+chmod 755 /home/wwwlogs
+chown -R www:www /home/www
+
+tar zxvf nginx-1.0.15.tar.gz
+cd nginx-1.0.15/
+./configure --user=www --group=www --prefix=/usr/local/nginx --with-http_stub_status_module --with-http_ssl_module --with-http_gzip_static_module
+make &amp;&amp; make install
+mkdir /usr/local/nginx/conf/vhosts/ #用于配置各域名
+
+// 修改Nginx的配置文件
+mv /usr/local/nginx/conf/nginx.conf /usr/local/nginx/conf/nginx_bak.conf
+vi /usr/local/nginx/conf/nginx.conf
+
+
+user  www;
+worker_processes  8;
+
+#error_log  logs/error.log;
+#error_log  logs/error.log  notice;
+#error_log  logs/error.log  info;
+
+#pid        logs/nginx.pid;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    #log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+    #                  '$status $body_bytes_sent "$http_referer" '
+    #                  '"$http_user_agent" "$http_x_forwarded_for"';
+
+    #access_log  logs/access.log  main;
+
+    sendfile        on;
+    #tcp_nopush     on;
+
+    #keepalive_timeout  0;
+    keepalive_timeout  65;
+
+    #gzip  on;
+
+    server {
+        listen       80;
+        server_name  localhost;
+        index index.php index.html index.htm;
+        root D:/xampp/htdocs/enterprise;
+
+        # redirect server error pages to the static page /50x.html
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   html;
+        }
+             
+        location ~ .*\.(gif|jpg|jpeg|png|bmp|swf)$
+        {
+            expires 30d;
+        }
+
+        location ~ .*\.(js|css)?$
+        {
+            expires 24h;
+        }
+    
+        if ($request_filename !~* (\.xml|\.rar|\.html|\.htm|\.php|\.swf|\.css|\.js|\.gif|\.png|\.jpg|\.jpeg|robots\.txt|index\.php|\.jnlp|\.jar|\.eot|\.woff|\.ttf|\.svg)) {
+            rewrite ^/(.*)$ /index.php/$1 last;
+        }
+
+        location ~ .*\.php {
+            fastcgi_pass   127.0.0.1:9000;
+            fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+            fastcgi_index  index.php;
+            fastcgi_split_path_info ^(.+\.php)(.*)$;                                         
+            fastcgi_param   SCRIPT_FILENAME $document_root$fastcgi_script_name;                 
+            fastcgi_param   PATH_INFO $fastcgi_path_info;                                       
+            fastcgi_param   PATH_TRANSLATED $document_root$fastcgi_path_info;                   
+            include fastcgi_params;  
+        }
+    }
+
+}
+</code></pre>
+
+<p>因为默认是没有nginx管理脚本的，在此先新建一个，运行vi /etc/init.d/nginx，输入</p>
+
+<pre><code>#!/bin/sh
+#
+# nginx - this script starts and stops the nginx daemin
+#
+# chkconfig:   - 85 15 
+# description:  Nginx is an HTTP(S) server, HTTP(S) reverse \
+#               proxy and IMAP/POP3 proxy server
+# processname: nginx
+# config:      /usr/local/nginx/conf/nginx.conf
+# pidfile:     /usr/local/nginx/logs/nginx.pid
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+# Source networking configuration.
+. /etc/sysconfig/network
+
+# Check that networking is up.
+[ "$NETWORKING" = "no" ] &amp;&amp; exit 0
+
+nginx="/usr/local/nginx/sbin/nginx"
+prog=$(basename $nginx)
+
+NGINX_CONF_FILE="/usr/local/nginx/conf/nginx.conf"
+
+lockfile=/var/lock/subsys/nginx
+
+start() {
+    [ -x $nginx ] || exit 5
+    [ -f $NGINX_CONF_FILE ] || exit 6
+    echo -n $"Starting $prog: "
+    daemon $nginx -c $NGINX_CONF_FILE
+    retval=$?
+    echo
+    [ $retval -eq 0 ] &amp;&amp; touch $lockfile
+    return $retval
+}
+
+stop() {
+    echo -n $"Stopping $prog: "
+    killproc $prog -QUIT
+    retval=$?
+    echo
+    [ $retval -eq 0 ] &amp;&amp; rm -f $lockfile
+    return $retval
+}
+
+restart() {
+    configtest || return $?
+    stop
+    start
+}
+
+reload() {
+    configtest || return $?
+    echo -n $"Reloading $prog: "
+    killproc $nginx -HUP
+    RETVAL=$?
+    echo
+}
+
+force_reload() {
+    restart
+}
+
+configtest() {
+  $nginx -t -c $NGINX_CONF_FILE
+}
+
+rh_status() {
+    status $prog
+}
+
+rh_status_q() {
+    rh_status &gt;/dev/null 2&gt;&amp;1
+}
+
+case "$1" in
+    start)
+        rh_status_q &amp;&amp; exit 0
+        $1
+        ;;
+    stop)
+        rh_status_q || exit 0
+        $1
+        ;;
+    restart|configtest)
+        $1
+        ;;
+    reload)
+        rh_status_q || exit 7
+        $1
+        ;;
+    force-reload)
+        force_reload
+        ;;
+    status)
+        rh_status
+        ;;
+    condrestart|try-restart)
+        rh_status_q || exit 0
+            ;;
+    *)
+        echo $"Usage: $0 {start|stop|status|restart|condrestart|try-restart|reload|force-reload|configtest}"
+        exit 2
+esac
+</code></pre>
+
+<p>为该文件增加执行权限，并设置为自启动</p>
+
+<pre><code>chmod +x /etc/init.d/nginx
+chkconfig nginx on
+</code></pre>
+
+<p>环境说明</p>
+
+<p>直接输入以下命令，会得到相应的结果</p>
+
+<pre><code>service nginx restart 重启nginx
+service mysql restart 重启mysql
+service php-fpm restart 重启php-fpm
+service php-fpm stop 停止php-fpm
+service php-fpm start 启动php-fpm
+</code></pre>
+
+<p>各站点的根目录是/home/www/</p>
+
+<pre><code>php: /usr/local/php/etc/
+nginx: /usr/local/nginx/conf/
+find / -name "my.ini"
+</code></pre>
+
+<p>启动nginx的时候遇到 error while loading shared libraries: libpcre.so.1:</p>
+
+<p>答：增加以下软连接，注意，如果是64位系统，对应目录是/lib64</p>
+
+<pre><code># cd /lib64
+cd /lib
+ln -s /usr/local/lib/libpcre.so.1 /lib64
+</code></pre>
+
+<p>Centos查看端口占用情况命令，比如查看80端口占用情况使用如下命令：</p>
+
+<pre><code>lsof -i tcp:80
+</code></pre>
+
+<p>列出所有端口</p>
+
+<pre><code>netstat -ntlp
+</code></pre>
+
+<p>查看进程</p>
+
+<pre><code>ps -ef | grep nginx
+</code></pre>
+
+                </div>
+                
+                <!-- 多说 Share start -->
+                <div class="ds-share"
+                    style="text-align: right"
+                    data-thread-key="/php/2013/12/05/lnmp"
+                    data-title="Linux + Nginx + Mysql + PHP 编译安装"
+                    data-url="http://xpmozong.github.io/php/2013/12/05/lnmp/"
+                    data-images="http://xpmozong.github.io/img/post-bg-2015.jpg"
+                    data-content="首先准备安装包
+
+nginx-1.0.15.tar.gz
+php-5.3.16.tar.gz
+libaio-0.3.93-4.i386.rpm
+MySQL... | 寞踪的博客 | Ellen Blog " >
+                    <div class="ds-share-inline">
+                      <ul  class="ds-share-icons-16">
+                        <li data-toggle="ds-share-icons-more"><a class="ds-more" href="#">分享到：</a></li>
+                        <li><a class="ds-wechat flat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+                        <li><a class="ds-weibo flat" href="javascript:void(0);" data-service="weibo">微博</a></li>
+                        <li><a class="ds-douban flat" href="javascript:void(0);" data-service="douban">豆瓣</a></li>
+                      </ul>
+                      <div class="ds-share-icons-more">
+                      </div>
+                    </div>
+                <hr>
+                </div>
+                <!-- 多说 Share end-->
+                
+                <div class="pager20">
+                    <ul class="pagination clearfix">
+                        
+                        <li class="previous">
+                            <a href="/linux/2013/11/29/linux-summary/" data-toggle="tooltip" data-placement="top" title="linux 小总结">
+                                <i class="fa fa-arrow-circle-o-left"></i> Previous Post
+                            </a>
+                        </li>
+                        
+                        
+                        <li class="next">
+                            <a href="/php/2013/12/05/php-extension/" data-toggle="tooltip" data-placement="top" title="PHP扩展开发 - 第一个扩展">
+                                Next Post <i class="fa fa-arrow-circle-o-right"></i>
+                            </a>
+                        </li>
+                        
+                    </ul>
+                </div>
+                
+                <!-- 多说评论框 start -->
+                <div class="comment">
+                    <div class="ds-thread"
+                        data-thread-key="/php/2013/12/05/lnmp"
+                        data-title="Linux + Nginx + Mysql + PHP 编译安装"
+                        data-url="http://xpmozong.github.io/php/2013/12/05/lnmp/" >
+                    </div>
+                </div>
+                <!-- 多说评论框 end -->
+
+                <!-- Duoshuo hacking -->
+                <input id="dsUser" type="hidden" value="xpmozong"  />
+
+                <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+                <script type="text/javascript">
+                    // dynamic User hacking by Hux
+                    var _user = document.getElementById('dsUser').value;
+                    // duoshuo comment query.
+                    var duoshuoQuery = {short_name: _user };
+                    (function() {
+                        var ds = document.createElement('script');
+                        ds.type = 'text/javascript';ds.async = true;
+                        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+                        ds.charset = 'UTF-8';
+                        (document.getElementsByTagName('head')[0]
+                         || document.getElementsByTagName('body')[0]).appendChild(ds);
+                    })();
+                </script>
+                <!-- 多说公共JS代码 end -->
+                
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Main Container -->
+<p id="back-top"><a href="#top"></a></p>
+<!-- Start Footer -->
+<div class="container zerogrid clearfix">
+    <div id="footer-container" class="wrap-col">
+        <p>Copyrigh &copy; 寞踪的博客 2010-2015</p>
+    </div>
+</div>
+<!-- End Footer -->
+<!-- async load function -->
+<script type="text/javascript">
+    function async(u, c) {
+        var d = document, t = 'script',
+        o = d.createElement(t),
+        s = d.getElementsByTagName(t)[0];
+        o.src = u;
+        if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+        s.parentNode.insertBefore(o, s);
+    }
+
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+    
+    $(function(){
+        var href = location.href;
+        var localh = location.origin+"/";
+        href = href.replace(localh,"");
+        var hrearr = href.split('/');
+        $(".sf-menu li").removeClass('current-menu-item');
+        if (hrearr[0] == 'about') {
+            $("#about").addClass('current-menu-item');
+        }else if(hrearr[0] == 'tags'){
+            $("#tags").addClass('current-menu-item');
+        }else{
+            $("#home").addClass('current-menu-item');
+        }
+
+        $("pre").addClass("prettyprint");
+        prettyPrint();
+
+        // hide #back-top first
+        $("#back-top").hide();
+
+        // fade in #back-top
+        $(function () {
+            $(window).scroll(function () {
+                if ($(this).scrollTop() > 400) {
+                    $('#back-top').fadeIn();
+                } else {
+                    $('#back-top').fadeOut();
+                }
+        });
+
+        // scroll body to 0px on click
+        $('#back-top a').click(function () {
+            $('body,html').animate({
+                scrollTop: 0
+                }, 800);
+            return false;
+            });
+        });
+
+    });
+
+</script>
+</body>
+</html>
+
+
+
+
+
+<!-- BT hacking -->
+<input id="baId" type="hidden" value="6dcc729d6a5d5c61d7c8835eb7418d54"  />
+
+<!-- Baidu Tongji -->
+<script>
+    // dynamic User hacking by Hux
+    var _baId = document.getElementById('baId').value;
+
+    // Originial
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?" + _baId;
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+

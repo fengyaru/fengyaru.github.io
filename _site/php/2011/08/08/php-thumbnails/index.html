@@ -1,0 +1,352 @@
+<!DOCTYPE html lang="en-US">
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="description" content="寞踪的技术博客，主攻PHP，iOS，Python，Linux，C。">
+<meta name="keyword"  content="寞踪的博客">
+<link rel="shortcut icon" href="img/favicon.ico">
+<title>PHP按比例缩放图 - 寞踪的博客 | Ellen Blog</title>
+<link rel="canonical" href="http://xpmozong.github.io/php/2011/08/08/php-thumbnails/">
+<link href="http://cdn.staticfile.org/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+<link rel='stylesheet' href="/css/style.css" type='text/css' media='all' />
+<link rel='stylesheet' href="/css/color/green.css" type='text/css' media='all' />
+<link href="/google-code-prettify/tomorrow-night-eighties.css" rel="stylesheet" type="text/css" media="all">
+<script src="/google-code-prettify/jquery.js"></script>
+<script src="/google-code-prettify/prettify.js"></script>
+<body class="home blog">
+    <!-- Start Header -->
+    <div class="container zerogrid clearfix">
+        <div class="col-full">
+            <div class="wrap-col">
+                <div id="header-nav-container" class="clearfix">
+                    <div class="h-logo">
+                        <a href="/">
+                            寞踪的博客
+                        </a>
+                    </div>
+                    <div class="h-menu">
+                        <!-- Navigation Menu -->     
+                        <ul class="sf-menu">
+                            <li id="home" class="menu-item current-menu-item">
+                                <a href="/">Home</a>
+                            </li>
+                            <li id="about" class="menu-item">
+                                <a href="/about/">About</a>
+                            </li>
+                            <li id="tags" class="menu-item">
+                                <a href="/tags/">Tags</a>
+                            </li>
+                        </ul> 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<!-- Start Main Container -->
+<div class="container zerogrid">
+    <div class="col-full">
+        <div class="wrap-col page-conainer">
+            <div class="post-margin">
+                <h5 class="page-title">
+                    PHP按比例缩放图
+                </h5>
+                
+                <div class="post-subtitle">
+                    
+                </div>
+                
+                <ul class="post-status clearfix">
+                    <li><i class="fa fa-clock-o"></i>August 8, 2011</li>
+                </ul>
+                <div class="post-content">
+                    <p>upload.php文件内容</p>
+
+<pre><code>$uid = 3;
+$time = time();
+// 图片目录
+$img_dir = "upload/";
+// 把图片传到服务器
+// 初始化变量
+$uploaded = 0;
+$unuploaded = 0;
+$imgname = $uid.$time;
+//只允许三张图片上传
+for ($i=0; $i&lt;=2; $i++) {
+    //获取当前图片的信息
+    $is_file = $_FILES['imgfile']['name'][$i];
+    //如果当前图片不为空
+    if (!empty($is_file)) {
+        // 判断上传的图片的类型是不是jpg,gif,png,bmp中的一种，同时判断是否上传成功
+        $imgtypearr = array('image/jpeg','image/gif','image/png','image/bmp');
+        $imgtype = $_FILES['imgfile']['type'][$i];
+        if (in_array($imgtype,$imgtypearr)) {
+            move_uploaded_file($_FILES['imgfile']['tmp_name'][$i], $img_dir.$imgname.$is_file);
+            //按比例缩放图片
+            if(resizeImage($img_dir.$imgname.$is_file,330,380,$img_dir.$imgname.$is_file)){
+                echo $is_file."缩小图片成功！";
+            }else{
+                echo $is_file."上传图片失败！";
+            }
+        }else{
+            echo $is_file.'图片格式不对！';
+        }
+    }
+}
+
+/**
+ * 按比例缩小图片
+ *
+ * @param string $im 源文件
+ * @param int $maxwidth 规定图片宽 324px
+ * @param int $maxhidth 规定图片高 343px
+   	 * @param int $maxwidth 输出文件
+ *
+ * 返回文件
+ *
+ */
+function resizeImage($im,$maxwidth,$maxheight,$to)
+{
+    // 载入图像到php到变量中
+    $suffix = substr(strrchr($im,'.'),1); //strrchr返回最后的.jpg 或者.jpeg
+    $style = strtolower($suffix);
+    if($style=='jpg' || $style=='jpeg'){
+        $originail = imagecreatefromjpeg($im); //jpg
+    }elseif($style=='png'){
+        $originail = imagecreatefrompng($im); //png
+    }elseif($style=='gif'){
+        $originail = imagecreatefromgif($im); //gif
+    }
+    $dims = getimagesize($im); //获取图片大小；
+    //Array ( [0] =&gt; 800 [1] =&gt; 600 
+    [2] =&gt; 2 [3] =&gt; width="800" height="600" 
+    [bits] =&gt; 8 [channels] =&gt; 3 [mime] =&gt; image/jpeg )
+    $pic_width = $dims['0'];
+    $pic_height = $dims['1'];
+    if(($maxwidth &amp;&amp; $pic_width &gt; $maxwidth) || ($maxheight &amp;&amp; $pic_height &gt; $maxheight))
+    {
+        $resizewidth_tag = false;
+        $resizeheight_tag = false;
+
+        if($maxwidth &amp;&amp; $pic_width&gt;$maxwidth){
+            $widthratio = $maxwidth/$pic_width;
+            $resizewidth_tag = true;
+        }
+
+        if($maxheight &amp;&amp; $pic_height&gt;$maxheight){
+            $heightratio = $maxheight/$pic_height;
+            $resizeheight_tag = true;
+        }
+
+        if($resizewidth_tag &amp;&amp; $resizeheight_tag){
+            if($widthratio&lt;$heightratio)
+                $ratio = $widthratio;
+            else
+                $ratio = $heightratio;
+        }
+
+        if($resizewidth_tag &amp;&amp; !$resizeheight_tag)
+            $ratio = $widthratio;
+        if($resizeheight_tag &amp;&amp; !$resizewidth_tag)
+            $ratio = $heightratio;
+
+        $newwidth = $pic_width * $ratio;
+        $newheight = $pic_height * $ratio;
+
+        //创建空白图像
+        $newim = imagecreatetruecolor($newwidth,$newheight);
+
+        //重采样拷贝部分图像并调整大小
+        imagecopyresampled($newim,$originail ,0,0,0,0,$newwidth,$newheight,$dims['0'],$dims['1']);
+        
+    }else{
+        //创建空白图像
+        $newim = imagecreatetruecolor($dims['0'],$dims['1']);
+        //重采样拷贝部分图像并调整大小
+        imagecopyresampled($newim,$originail,0,0,0,0,$dims['0'],$dims['1'],$dims['0'],$dims['1']);
+    }
+
+    return imagejpeg($newim,$to);
+}
+</code></pre>
+
+<p>PHP 按比例缩放图片</p>
+
+                </div>
+                
+                <!-- 多说 Share start -->
+                <div class="ds-share"
+                    style="text-align: right"
+                    data-thread-key="/php/2011/08/08/php-thumbnails"
+                    data-title="PHP按比例缩放图"
+                    data-url="http://xpmozong.github.io/php/2011/08/08/php-thumbnails/"
+                    data-images="http://xpmozong.github.io/img/post-bg-2015.jpg"
+                    data-content="upload.php文件内容
+
+$uid = 3;
+$time = time();
+// 图片目录
+$img_dir = "upload/";
+// 把图... | 寞踪的博客 | Ellen Blog " >
+                    <div class="ds-share-inline">
+                      <ul  class="ds-share-icons-16">
+                        <li data-toggle="ds-share-icons-more"><a class="ds-more" href="#">分享到：</a></li>
+                        <li><a class="ds-wechat flat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+                        <li><a class="ds-weibo flat" href="javascript:void(0);" data-service="weibo">微博</a></li>
+                        <li><a class="ds-douban flat" href="javascript:void(0);" data-service="douban">豆瓣</a></li>
+                      </ul>
+                      <div class="ds-share-icons-more">
+                      </div>
+                    </div>
+                <hr>
+                </div>
+                <!-- 多说 Share end-->
+                
+                <div class="pager20">
+                    <ul class="pagination clearfix">
+                        
+                        
+                        <li class="next">
+                            <a href="/redis/2011/08/19/redis-humble-opinion/" data-toggle="tooltip" data-placement="top" title="Redis 浅见">
+                                Next Post <i class="fa fa-arrow-circle-o-right"></i>
+                            </a>
+                        </li>
+                        
+                    </ul>
+                </div>
+                
+                <!-- 多说评论框 start -->
+                <div class="comment">
+                    <div class="ds-thread"
+                        data-thread-key="/php/2011/08/08/php-thumbnails"
+                        data-title="PHP按比例缩放图"
+                        data-url="http://xpmozong.github.io/php/2011/08/08/php-thumbnails/" >
+                    </div>
+                </div>
+                <!-- 多说评论框 end -->
+
+                <!-- Duoshuo hacking -->
+                <input id="dsUser" type="hidden" value="xpmozong"  />
+
+                <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+                <script type="text/javascript">
+                    // dynamic User hacking by Hux
+                    var _user = document.getElementById('dsUser').value;
+                    // duoshuo comment query.
+                    var duoshuoQuery = {short_name: _user };
+                    (function() {
+                        var ds = document.createElement('script');
+                        ds.type = 'text/javascript';ds.async = true;
+                        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+                        ds.charset = 'UTF-8';
+                        (document.getElementsByTagName('head')[0]
+                         || document.getElementsByTagName('body')[0]).appendChild(ds);
+                    })();
+                </script>
+                <!-- 多说公共JS代码 end -->
+                
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Main Container -->
+<p id="back-top"><a href="#top"></a></p>
+<!-- Start Footer -->
+<div class="container zerogrid clearfix">
+    <div id="footer-container" class="wrap-col">
+        <p>Copyrigh &copy; 寞踪的博客 2010-2015</p>
+    </div>
+</div>
+<!-- End Footer -->
+<!-- async load function -->
+<script type="text/javascript">
+    function async(u, c) {
+        var d = document, t = 'script',
+        o = d.createElement(t),
+        s = d.getElementsByTagName(t)[0];
+        o.src = u;
+        if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+        s.parentNode.insertBefore(o, s);
+    }
+
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+    
+    $(function(){
+        var href = location.href;
+        var localh = location.origin+"/";
+        href = href.replace(localh,"");
+        var hrearr = href.split('/');
+        $(".sf-menu li").removeClass('current-menu-item');
+        if (hrearr[0] == 'about') {
+            $("#about").addClass('current-menu-item');
+        }else if(hrearr[0] == 'tags'){
+            $("#tags").addClass('current-menu-item');
+        }else{
+            $("#home").addClass('current-menu-item');
+        }
+
+        $("pre").addClass("prettyprint");
+        prettyPrint();
+
+        // hide #back-top first
+        $("#back-top").hide();
+
+        // fade in #back-top
+        $(function () {
+            $(window).scroll(function () {
+                if ($(this).scrollTop() > 400) {
+                    $('#back-top').fadeIn();
+                } else {
+                    $('#back-top').fadeOut();
+                }
+        });
+
+        // scroll body to 0px on click
+        $('#back-top a').click(function () {
+            $('body,html').animate({
+                scrollTop: 0
+                }, 800);
+            return false;
+            });
+        });
+
+    });
+
+</script>
+</body>
+</html>
+
+
+
+
+
+<!-- BT hacking -->
+<input id="baId" type="hidden" value="6dcc729d6a5d5c61d7c8835eb7418d54"  />
+
+<!-- Baidu Tongji -->
+<script>
+    // dynamic User hacking by Hux
+    var _baId = document.getElementById('baId').value;
+
+    // Originial
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?" + _baId;
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+

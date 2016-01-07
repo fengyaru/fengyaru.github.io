@@ -1,0 +1,507 @@
+<!DOCTYPE html lang="en-US">
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="description" content="寞踪的技术博客，主攻PHP，iOS，Python，Linux，C。">
+<meta name="keyword"  content="寞踪的博客">
+<link rel="shortcut icon" href="img/favicon.ico">
+<title>C语言指针 - 寞踪的博客 | Ellen Blog</title>
+<link rel="canonical" href="http://xpmozong.github.io/c/2014/03/20/c-zhizhen/">
+<link href="http://cdn.staticfile.org/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+<link rel='stylesheet' href="/css/style.css" type='text/css' media='all' />
+<link rel='stylesheet' href="/css/color/green.css" type='text/css' media='all' />
+<link href="/google-code-prettify/tomorrow-night-eighties.css" rel="stylesheet" type="text/css" media="all">
+<script src="/google-code-prettify/jquery.js"></script>
+<script src="/google-code-prettify/prettify.js"></script>
+<body class="home blog">
+    <!-- Start Header -->
+    <div class="container zerogrid clearfix">
+        <div class="col-full">
+            <div class="wrap-col">
+                <div id="header-nav-container" class="clearfix">
+                    <div class="h-logo">
+                        <a href="/">
+                            寞踪的博客
+                        </a>
+                    </div>
+                    <div class="h-menu">
+                        <!-- Navigation Menu -->     
+                        <ul class="sf-menu">
+                            <li id="home" class="menu-item current-menu-item">
+                                <a href="/">Home</a>
+                            </li>
+                            <li id="about" class="menu-item">
+                                <a href="/about/">About</a>
+                            </li>
+                            <li id="tags" class="menu-item">
+                                <a href="/tags/">Tags</a>
+                            </li>
+                        </ul> 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<!-- Start Main Container -->
+<div class="container zerogrid">
+    <div class="col-full">
+        <div class="wrap-col page-conainer">
+            <div class="post-margin">
+                <h5 class="page-title">
+                    C语言指针
+                </h5>
+                
+                <div class="post-subtitle">
+                    
+                </div>
+                
+                <ul class="post-status clearfix">
+                    <li><i class="fa fa-clock-o"></i>March 20, 2014</li>
+                </ul>
+                <div class="post-content">
+                    <p>C语言指针</p>
+
+<p><strong>一、指针变量定义</strong></p>
+
+<pre><code>int *p = NULL;  // p 为变量名，NULL初始值，NULL恒等于0。
+</code></pre>
+
+<p>与普通变量不同的是，定义指针变量的时候，前面需要加 * 。</p>
+
+<pre><code>int a = 3;
+int *p = &amp;a;    // 指针取地址
+</code></pre>
+
+<p><strong>二、指针重新赋值</strong></p>
+
+<pre><code>*p = 100;   // (*p) 代表 a，p代表a的地址
+</code></pre>
+
+<p><strong>三、指针数组</strong></p>
+
+<pre><code>int arr[3] = {1,3,8};
+</code></pre>
+
+<p>在C语言中，数组是构造类型，系统会分配一段连续的空间来存储数组的全部数据。其中数组名代表数组首元素地址（第一个元素的内存地址）。</p>
+
+<p>arr 恒等于 &amp;arr[0]。</p>
+
+<pre><code>int *p = arr; // 保存数组首地址  此时p与arr相同，均指向数组的首地址。
+</code></pre>
+
+<p>p[1] = 3; <br />
+恒等于a[1]<br />
+恒等于<em>(p+1)<br />
+恒等于</em>(a+1)</p>
+
+<p><strong>四、指针与字符串</strong></p>
+
+<pre><code>char string[] = "iPhone";
+char *p = string;
+</code></pre>
+
+<p><strong>五、指针数组</strong></p>
+
+<pre><code>char *strings[3] = {"iPhone", "Android", "win8"};
+</code></pre>
+
+<p>注意可以通过指针来修改字符数组，但不可以修改字符串。修改用strcopy。</p>
+
+<p><strong>六、结构体指针</strong></p>
+
+<p>定义一个结构体</p>
+
+<pre><code>typedef struct {
+    char name[20];
+    char sex;
+} Student;
+</code></pre>
+
+<p>结构体指针定义</p>
+
+<pre><code>Student stu = {"Ellen", 'f'};
+Student *p = &amp;stu;
+
+//  修改
+(*p).sex = 'm';
+p-&gt;sex = 'm';
+
+//  访问
+printf("%c\n", p-&gt;sex); 
+</code></pre>
+
+<p><strong>七、结构体数组</strong></p>
+
+<pre><code>Student stus[3] = {
+    {"Ellen", 'f'},
+    {"Albert", 'm'}
+};
+
+Student *p = stus;
+for(int i = 0, i &lt; 3, i++){
+    printf("%c ", (p+i)-&gt;sex);
+}
+</code></pre>
+
+<p><strong>八、结构体指针为函数参数</strong></p>
+
+<pre><code>void printStudents(const Student *pStu, int count);
+</code></pre>
+
+<p><strong>九、函数指针定义</strong></p>
+
+<pre><code>int maxValue(int a, int b)
+{
+    return a &gt; b ? a : b
+}
+
+int (*p)(int a, int b) = NULL;
+p = maxValue;   // 赋值函数名
+int m = p(3,5); // 指针可当函数用
+</code></pre>
+
+<p><strong>十、函数指针回调函数</strong></p>
+
+<pre><code>int getValue(int a, int b, int (*p)(int,int))
+{
+    return p(a, b);
+}
+</code></pre>
+
+<p>函数指针做getValue函数的参数</p>
+
+<pre><code>int value = getValue(3,5, maxValue);
+</code></pre>
+
+<p><strong>十一、用函数指针回调函数的案例</strong></p>
+
+<p>新建 Student.h 和 Student.m 文件</p>
+
+<p>在Student.h文件里</p>
+
+<pre><code>// 声明一个学生结构体
+typedef struct {
+    char  name[30]; // 名字
+    int   age;      // 年龄
+    float score;    // 成绩
+} Student;
+</code></pre>
+
+<p>main.m主函数文件</p>
+
+<pre><code>// 目标是对学生数组的名字或者年龄或者成绩排序
+// 用回调指针函数排序
+Student stus[] = {
+    {"Ellen2", 23, 88},
+    {"Ellen1", 20, 99},
+    {"Ellen4", 18, 77},
+    {"Ellen3", 22, 66}
+};
+
+int count = sizeof(stus) / sizeof(*stus);
+// 实现下面的函数
+sortArray(stus, count, "score");
+printArray(stus, count);
+</code></pre>
+
+<p>如何完成上面的目标？</p>
+
+<p>Student.h 文件 引入</p>
+
+<pre><code>#include &lt;string.h&gt;
+#include &lt;stdbool.h&gt;
+</code></pre>
+
+<p>剩下的内容：</p>
+
+<pre><code>// 比较名字
+bool compareName(const Student *pStu1, const Student *pStu2);
+// 比较年龄
+bool compareAge(const Student *pStu1, const Student *pStu2);
+// 比较成绩
+bool compareScore(const Student *pStu1, const Student *pStu2);
+// 定义一个指针函数
+typedef bool (*PFUNC)(const Student *, const Student *);
+// 声明一个函数名结构体
+typedef struct{
+    char name[20];  // 函数名
+    PFUNC p;        // 指针函数
+} FuncName;
+// 交换位置
+void swap(Student *pStu1, Student *pStu2);
+// 冒泡排序
+void bubbleSort(Student *pArr, const int count, PFUNC p);
+// 根据传入的参数，返回哪种函数
+PFUNC getFuncName(const char *pName);
+// 排序，pName 传入参数，选择根据XX排序
+void sortArray(Student *pArr, const int count, const char *pName);
+// 遍历数组
+void printArray(const Student *pArr, const int count);
+</code></pre>
+
+<p>Student.m 文件实现.h里声明的函数</p>
+
+<pre><code>// 比较名字
+bool compareName(const Student *pStu1, const Student *pStu2)
+{
+    return strcmp(pStu1-&gt;name, pStu2-&gt;name) &gt; 0;
+}
+// 比较年龄
+bool compareAge(const Student *pStu1, const Student *pStu2)
+{
+    return pStu1-&gt;age &gt; pStu2-&gt;age;
+}
+// 比较成绩
+bool compareScore(const Student *pStu1, const Student *pStu2)
+{
+    return pStu1-&gt;score &gt; pStu2-&gt;score;
+}
+// 交换位置
+void swap(Student *pStu1, Student *pStu2)
+{
+    Student temp = *pStu1;
+    *pStu1 = *pStu2;
+    *pStu2 = temp;
+}
+// 冒泡排序
+void bubbleSort(Student *pArr, const int count, PFUNC p)
+{
+    for (int i = 0; i &lt; count; i++) {
+        for (int j = 0; j &lt; count - i - 1; j++) {
+            if (p(pArr + j, pArr + j + 1)) {
+                swap(pArr + j, pArr + j + 1);
+            }
+        }
+    }
+}
+// 根据传入的参数，返回哪种函数
+PFUNC getFuncName(const char *pName)
+{
+    FuncName funcNames[] = {
+        {"name", compareName},
+        {"age", compareAge},
+        {"score", compareScore}
+    };
+    PFUNC p = NULL;
+    for (int i = 0; i &lt; sizeof(funcNames) / sizeof(*funcNames); i++) {
+        if (strcmp(funcNames[i].name, pName) == 0) {
+            p = funcNames[i].p;
+            break;
+        }
+    }
+    return p;
+}
+// 排序，pName 传入参数，选择根据XX排序
+void sortArray(Student *pArr, const int count, const char *pName)
+{
+    PFUNC p = NULL;
+    p = getFuncName(pName);
+    if (p != NULL) {
+        bubbleSort(pArr, count, p);
+    }else{
+        printf("函数名输入错误!\n");
+    }
+}
+// 遍历数组
+void printArray(const Student *pArr, const int count)
+{
+    for (int i = 0; i &lt; count; i++) {
+        printf("%s %d %.2f\n", pArr[i].name, pArr[i].age, pArr[i].score);
+    }
+}
+</code></pre>
+
+<p>main.m主函数文件只需要指定，根据XX排序，就可以了。</p>
+
+<p>比如按照 年龄 排序</p>
+
+<pre><code>sortArray(stus, count, "age");
+</code></pre>
+
+
+                </div>
+                
+                <!-- 多说 Share start -->
+                <div class="ds-share"
+                    style="text-align: right"
+                    data-thread-key="/c/2014/03/20/c-zhizhen"
+                    data-title="C语言指针"
+                    data-url="http://xpmozong.github.io/c/2014/03/20/c-zhizhen/"
+                    data-images="http://xpmozong.github.io/img/post-bg-2015.jpg"
+                    data-content="C语言指针
+
+一、指针变量定义
+
+int *p = NULL;  // p 为变量名，NULL初始值，NULL恒等于0。
+
+
+与普通变量不同的是，定义指针... | 寞踪的博客 | Ellen Blog " >
+                    <div class="ds-share-inline">
+                      <ul  class="ds-share-icons-16">
+                        <li data-toggle="ds-share-icons-more"><a class="ds-more" href="#">分享到：</a></li>
+                        <li><a class="ds-wechat flat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+                        <li><a class="ds-weibo flat" href="javascript:void(0);" data-service="weibo">微博</a></li>
+                        <li><a class="ds-douban flat" href="javascript:void(0);" data-service="douban">豆瓣</a></li>
+                      </ul>
+                      <div class="ds-share-icons-more">
+                      </div>
+                    </div>
+                <hr>
+                </div>
+                <!-- 多说 Share end-->
+                
+                <div class="pager20">
+                    <ul class="pagination clearfix">
+                        
+                        <li class="previous">
+                            <a href="/php/2013/12/05/php-extension/" data-toggle="tooltip" data-placement="top" title="PHP扩展开发 - 第一个扩展">
+                                <i class="fa fa-arrow-circle-o-left"></i> Previous Post
+                            </a>
+                        </li>
+                        
+                        
+                        <li class="next">
+                            <a href="/oc/2014/04/12/oc-category/" data-toggle="tooltip" data-placement="top" title="OC category 类目的使用">
+                                Next Post <i class="fa fa-arrow-circle-o-right"></i>
+                            </a>
+                        </li>
+                        
+                    </ul>
+                </div>
+                
+                <!-- 多说评论框 start -->
+                <div class="comment">
+                    <div class="ds-thread"
+                        data-thread-key="/c/2014/03/20/c-zhizhen"
+                        data-title="C语言指针"
+                        data-url="http://xpmozong.github.io/c/2014/03/20/c-zhizhen/" >
+                    </div>
+                </div>
+                <!-- 多说评论框 end -->
+
+                <!-- Duoshuo hacking -->
+                <input id="dsUser" type="hidden" value="xpmozong"  />
+
+                <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+                <script type="text/javascript">
+                    // dynamic User hacking by Hux
+                    var _user = document.getElementById('dsUser').value;
+                    // duoshuo comment query.
+                    var duoshuoQuery = {short_name: _user };
+                    (function() {
+                        var ds = document.createElement('script');
+                        ds.type = 'text/javascript';ds.async = true;
+                        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+                        ds.charset = 'UTF-8';
+                        (document.getElementsByTagName('head')[0]
+                         || document.getElementsByTagName('body')[0]).appendChild(ds);
+                    })();
+                </script>
+                <!-- 多说公共JS代码 end -->
+                
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Main Container -->
+<p id="back-top"><a href="#top"></a></p>
+<!-- Start Footer -->
+<div class="container zerogrid clearfix">
+    <div id="footer-container" class="wrap-col">
+        <p>Copyrigh &copy; 寞踪的博客 2010-2015</p>
+    </div>
+</div>
+<!-- End Footer -->
+<!-- async load function -->
+<script type="text/javascript">
+    function async(u, c) {
+        var d = document, t = 'script',
+        o = d.createElement(t),
+        s = d.getElementsByTagName(t)[0];
+        o.src = u;
+        if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+        s.parentNode.insertBefore(o, s);
+    }
+
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+    
+    $(function(){
+        var href = location.href;
+        var localh = location.origin+"/";
+        href = href.replace(localh,"");
+        var hrearr = href.split('/');
+        $(".sf-menu li").removeClass('current-menu-item');
+        if (hrearr[0] == 'about') {
+            $("#about").addClass('current-menu-item');
+        }else if(hrearr[0] == 'tags'){
+            $("#tags").addClass('current-menu-item');
+        }else{
+            $("#home").addClass('current-menu-item');
+        }
+
+        $("pre").addClass("prettyprint");
+        prettyPrint();
+
+        // hide #back-top first
+        $("#back-top").hide();
+
+        // fade in #back-top
+        $(function () {
+            $(window).scroll(function () {
+                if ($(this).scrollTop() > 400) {
+                    $('#back-top').fadeIn();
+                } else {
+                    $('#back-top').fadeOut();
+                }
+        });
+
+        // scroll body to 0px on click
+        $('#back-top a').click(function () {
+            $('body,html').animate({
+                scrollTop: 0
+                }, 800);
+            return false;
+            });
+        });
+
+    });
+
+</script>
+</body>
+</html>
+
+
+
+
+
+<!-- BT hacking -->
+<input id="baId" type="hidden" value="6dcc729d6a5d5c61d7c8835eb7418d54"  />
+
+<!-- Baidu Tongji -->
+<script>
+    // dynamic User hacking by Hux
+    var _baId = document.getElementById('baId').value;
+
+    // Originial
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?" + _baId;
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+

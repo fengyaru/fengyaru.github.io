@@ -1,0 +1,747 @@
+<!DOCTYPE html lang="en-US">
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="description" content="寞踪的技术博客，主攻PHP，iOS，Python，Linux，C。">
+<meta name="keyword"  content="寞踪的博客">
+<link rel="shortcut icon" href="img/favicon.ico">
+<title>寞踪的博客 | Ellen Blog</title>
+<link rel="canonical" href="http://xpmozong.github.io/">
+<link href="http://cdn.staticfile.org/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+<link rel='stylesheet' href="/css/style.css" type='text/css' media='all' />
+<link rel='stylesheet' href="/css/color/green.css" type='text/css' media='all' />
+<link href="/google-code-prettify/tomorrow-night-eighties.css" rel="stylesheet" type="text/css" media="all">
+<script src="/google-code-prettify/jquery.js"></script>
+<script src="/google-code-prettify/prettify.js"></script>
+<body class="home blog">
+    <!-- Start Header -->
+    <div class="container zerogrid clearfix">
+        <div class="col-full">
+            <div class="wrap-col">
+                <div id="header-nav-container" class="clearfix">
+                    <div class="h-logo">
+                        <a href="/">
+                            寞踪的博客
+                        </a>
+                    </div>
+                    <div class="h-menu">
+                        <!-- Navigation Menu -->     
+                        <ul class="sf-menu">
+                            <li id="home" class="menu-item current-menu-item">
+                                <a href="/">Home</a>
+                            </li>
+                            <li id="about" class="menu-item">
+                                <a href="/about/">About</a>
+                            </li>
+                            <li id="tags" class="menu-item">
+                                <a href="/tags/">Tags</a>
+                            </li>
+                        </ul> 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<!-- Start Main Container -->
+<div class="container zerogrid clearfix">
+    <!-- Start Posts Container -->
+    <div class="col-2-3" id="post-container">
+        <div class="wrap-col">
+            <!-- Start Post Item -->
+
+<div class="post clearfix">
+    <div class="post-margin clearfix">
+        <h3 class="post-title">
+            <a href="/movie/2015/11/02/liehuozhuoxin/">
+                烈火灼心观后感
+            </a>
+        </h3>
+        
+        <div class="post-subtitle">
+            
+        </div>
+        
+        <ul class="post-status">
+            <li><i class="fa fa-clock-o"></i>November 2, 2015</li>
+        </ul>
+    </div>   
+    <div class="post-margin">
+        有的人天生就做不了坏人，有的人天生就是十恶不赦的坏人。
+
+本性不坏的人，一不小心做了错事，会内疚一生，会想办法补偿。
+
+烈火灼心从片头开始就是紧张灰色的基调，有个灭门惨案，三个逃犯逃到别的地方生存，还收养一个小女孩，一直都相安无事，阿道当出租车司机，辛小丰当协警，陈比觉当养鱼的，他们的养女叫尾巴。七年，竟然来了个头，还很碰巧的那个头调查过那个灭门惨案，更碰巧的是，那个头能力很强，责任心强，眼光敏锐。伊警官有次找小丰谈话，他说：“我很喜欢法律，只要不触碰到底线就没事，但是越过那到线，法律不容情，所以法律既人性又无情。”
+
+就是这么令人心情沉重的电影，突然来了那么两段，让我很想笑，又笑不出来。有次追两个台湾逃犯的过程中，那个拿斧子的哥们，是来搞笑的吧，自己来那么个一下，自己掉下去了，我对这个超级无语啊，这个要是在独木桥上上，那么个一下掉到小河里，我能笑个半死，但是却在几十层楼高的地方，那...
+    </div>
+    <ul class="post-social">
+        <li>
+            <a href="/movie/2015/11/02/liehuozhuoxin/" class="readmore">
+                Read More <i class="fa fa-arrow-circle-o-right"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+<div class="post clearfix">
+    <div class="post-margin clearfix">
+        <h3 class="post-title">
+            <a href="/redis/2015/08/28/redis-jiqun/">
+                Redis 集群
+            </a>
+        </h3>
+        
+        <div class="post-subtitle">
+            
+        </div>
+        
+        <ul class="post-status">
+            <li><i class="fa fa-clock-o"></i>August 28, 2015</li>
+        </ul>
+    </div>   
+    <div class="post-margin">
+        介绍
+
+redis 集群部署，针对两台以上服务器的部署，一个主服务器，多个从服务器。
+
+安装
+
+tar zxvf redis-2.8.12.tar.gz
+cd redis-2.8.12
+make
+
+
+创建文件夹并且拷贝
+
+mkdir /usr/redis
+
+cp redis.conf /usr/redis
+cd src
+cp redis-server /usr/redis
+cp redis-cli /usr/redis
+cp redis-benchmark /usr/redis
+cp mkreleasehdr.sh /usr/redis
+cp redis-check-aof /usr/redis
+cp redis-check-dump /usr/redis
+
+
+修改redis.conf文件 daemonize no 改为 yes # 是否后台运行
+
+复制启动文件
+
+cp redis-...
+    </div>
+    <ul class="post-social">
+        <li>
+            <a href="/redis/2015/08/28/redis-jiqun/" class="readmore">
+                Read More <i class="fa fa-arrow-circle-o-right"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+<div class="post clearfix">
+    <div class="post-margin clearfix">
+        <h3 class="post-title">
+            <a href="/php/2015/08/19/php-opcache/">
+                php opcache使用
+            </a>
+        </h3>
+        
+        <div class="post-subtitle">
+            
+        </div>
+        
+        <ul class="post-status">
+            <li><i class="fa fa-clock-o"></i>August 19, 2015</li>
+        </ul>
+    </div>   
+    <div class="post-margin">
+        介绍
+
+php opcache的缓存原理，主要是避免php重复编译，减少CPU和内存开销。
+
+安装
+
+到http://pecl.php.net/package/ZendOpcache下载
+
+tar zxvf zendopcache-7.0.5.tgz
+cd zendopcache-7.0.5
+phpize
+./configure
+make &amp;&amp; make install
+
+
+配置
+
+修改php.ini，在最后添加
+
+[Zend Opcache]
+zend_extension = "/usr/local/php-5.4.10/lib/php/extensions/no-debug-non-zts-20100525/opcache.so"
+opcache.force_restart_timeout=3600
+opcache.memory_consumption=1024
+...
+    </div>
+    <ul class="post-social">
+        <li>
+            <a href="/php/2015/08/19/php-opcache/" class="readmore">
+                Read More <i class="fa fa-arrow-circle-o-right"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+<div class="post clearfix">
+    <div class="post-margin clearfix">
+        <h3 class="post-title">
+            <a href="/book/2015/07/03/yitiantulongji/">
+                倚天屠龙记读后感
+            </a>
+        </h3>
+        
+        <div class="post-subtitle">
+            
+        </div>
+        
+        <ul class="post-status">
+            <li><i class="fa fa-clock-o"></i>July 3, 2015</li>
+        </ul>
+    </div>   
+    <div class="post-margin">
+        看了1年多的金庸武侠小说，写些读后感，就从我看的第一部金庸小说倚天屠龙记说起。
+
+武林争端：
+
+武林至尊，宝刀屠龙，号令天下，莫敢不从，倚天不出，谁与争锋。武林的一切纷争，都是由这两把刀剑引起的。
+倚天屠龙记里的大魔头混元霹雳手成昆，为了报私仇，设计让金毛狮王谢逊四处杀人，为明教树下无数武林公敌。说到底，就是为报仇，掺和了一群人。
+
+人物情感分析：
+
+殷素素是个漂亮，任性，聪明，对爱情不顾一切的人，她也不是特别坏，当她和殷野王设计从俞岱岩那夺到屠龙刀之后，殷野王将俞岱岩踢到江里就不管了，但是她却将俞岱岩救起来，重金让镖局的将人送到武当，但是俞岱岩被少林大力金刚指伤到残废。殷素素对张翠山一见钟情，她假扮张翠山，杀了少林很多人，就是为张翠山的三师哥报仇。所以殷素素是个矛盾的人，残忍又好心。张翠山虽然对殷素素那杀人不眨眼的手段不满，但见她对自己情深一片，不忍心看着她受伤不管。我觉得张翠山喜...
+    </div>
+    <ul class="post-social">
+        <li>
+            <a href="/book/2015/07/03/yitiantulongji/" class="readmore">
+                Read More <i class="fa fa-arrow-circle-o-right"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+<div class="post clearfix">
+    <div class="post-margin clearfix">
+        <h3 class="post-title">
+            <a href="/ios/2014/12/21/ios-tuwenhunpai/">
+                iOS 图文混排
+            </a>
+        </h3>
+        
+        <div class="post-subtitle">
+            iOS 图文混排 M80AttributedLabel的一些修改
+        </div>
+        
+        <ul class="post-status">
+            <li><i class="fa fa-clock-o"></i>December 21, 2014</li>
+        </ul>
+    </div>   
+    <div class="post-margin">
+        1、M80AttributedLabel的URL、号码、邮箱的正则匹配不是很好，我做了一些修改。
+
+#pragma mark - 正则匹配电话号码，网址链接，Email地址
++ (NSArray *)addRexArr:(NSString *)text
+{
+    NSString *parten = @"\\d{3}-\\d{8}|\\d{3}-\\d{7}|\\d{4}-\\d{8}|\\d{4}-\\d{7}|1+[358]+\\d{9}|\\d{8}|\\d{7}";
+    NSArray *resultArray = [text componentsMatchedByRegex:parten];
+    NSMutableArray *phoneArray = [[NSMutableArray alloc] initWithArray:resultArray];
+    ...
+    </div>
+    <ul class="post-social">
+        <li>
+            <a href="/ios/2014/12/21/ios-tuwenhunpai/" class="readmore">
+                Read More <i class="fa fa-arrow-circle-o-right"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+<div class="post clearfix">
+    <div class="post-margin clearfix">
+        <h3 class="post-title">
+            <a href="/ios/2014/11/05/ios-fmdb-sqlite/">
+                iOS FMDB Sqlite封装
+            </a>
+        </h3>
+        
+        <div class="post-subtitle">
+            
+        </div>
+        
+        <ul class="post-status">
+            <li><i class="fa fa-clock-o"></i>November 5, 2014</li>
+        </ul>
+    </div>   
+    <div class="post-margin">
+        1、在使用FMDB的时候，总是出现崩溃的情况，报错信息总是提示某某表被锁住。为了解决这一问题，我做了封装。
+
+DBConnect.h如下:
+
+#import &lt;Foundation/Foundation.h&gt;
+#import "FMDB.h"
+#import "FMResultSet.h"
+
+@interface DBConnect : NSObject
+
+@property (nonatomic, retain) FMDatabase *dataBase;  // 数据库类
+@property (nonatomic, retain) FMDatabaseQueue *dbQueue;
+
+/// 通过单例的方式
++ (DBConnect *)shareConnect;
+
+/// 打开数据库
+- (void)openDatabase;
+
+/// 判断是否存在表
+- (BOO...
+    </div>
+    <ul class="post-social">
+        <li>
+            <a href="/ios/2014/11/05/ios-fmdb-sqlite/" class="readmore">
+                Read More <i class="fa fa-arrow-circle-o-right"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+<div class="post clearfix">
+    <div class="post-margin clearfix">
+        <h3 class="post-title">
+            <a href="/ios/2014/06/21/ios-zhengze/">
+                iOS 正则表达式
+            </a>
+        </h3>
+        
+        <div class="post-subtitle">
+            
+        </div>
+        
+        <ul class="post-status">
+            <li><i class="fa fa-clock-o"></i>June 21, 2014</li>
+        </ul>
+    </div>   
+    <div class="post-margin">
+        熟悉php的都知道preg_match_all是一个超级强大的正则表达式函数。在数据采集的世界里，有了她，几乎是所向披靡，神挡杀神，佛挡杀佛。
+
+由于Object-C有没有类似preg_match_all的函数。 NSPredicate 不是很理想。而RegexKit很强大。
+
+下载地址：RegexKit
+
+需要添加一个依懒库：libicucore.dylib
+
+具体用法，首先引入头文件：
+
+#import "RegexKitLite.h"
+
+ASIHTTPRequest *htmlRequest = [ASIHTTPRequest requestWithURL:[NSURL URLWithString:str]];
+[htmlRequest setRequestMethod:@"GET"];
+[htmlRequest setTimeOutSeconds:30];
+[htmlRequ...
+    </div>
+    <ul class="post-social">
+        <li>
+            <a href="/ios/2014/06/21/ios-zhengze/" class="readmore">
+                Read More <i class="fa fa-arrow-circle-o-right"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+<div class="post clearfix">
+    <div class="post-margin clearfix">
+        <h3 class="post-title">
+            <a href="/oc/2014/04/25/oc-danli/">
+                IOS 单例设计模式
+            </a>
+        </h3>
+        
+        <div class="post-subtitle">
+            
+        </div>
+        
+        <ul class="post-status">
+            <li><i class="fa fa-clock-o"></i>April 25, 2014</li>
+        </ul>
+    </div>   
+    <div class="post-margin">
+        IOS单例设计模式，多个页面共用数据。
+
+创建Singleton类，继承NSObject，Singleton.h的内容为：
+
+@interface Singleton : NSObject
+// 单例， 类只有唯一的一个实例
++ (Singleton *)sharedSingleton;
+@property (nonatomic, retain) UIButton *b;
+@end
+
+
+Singleton.m的内容为：
+
+@implementation Singleton
+static Singleton *s = nil;
++ (Singleton *)sharedSingleton
+{
+    if (s == nil) {
+        s = [[Singleton alloc] init];
+    }
+    return s;
+}
+@end
+
+
+注意：单例中的allo...
+    </div>
+    <ul class="post-social">
+        <li>
+            <a href="/oc/2014/04/25/oc-danli/" class="readmore">
+                Read More <i class="fa fa-arrow-circle-o-right"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+<div class="post clearfix">
+    <div class="post-margin clearfix">
+        <h3 class="post-title">
+            <a href="/ios/2014/04/16/ios-target-action/">
+                iOS target/action设计模式
+            </a>
+        </h3>
+        
+        <div class="post-subtitle">
+            
+        </div>
+        
+        <ul class="post-status">
+            <li><i class="fa fa-clock-o"></i>April 16, 2014</li>
+        </ul>
+    </div>   
+    <div class="post-margin">
+        iOS中，有一种target/action设计模式，可以使代码高聚合，低耦合。
+
+创建一个ActionView类
+
+ActionView.h的文件内容为
+
+@interface ActionView : UIView
+@property (nonatomic, assign) id  target;
+@property (nonatomic, assign) SEL action;
+- (id)initWithFrame:(CGRect)frame target:(id)target action:(SEL)action;
+@end
+
+
+ActionView.m的文件内容为
+
+- (id)initWithFrame:(CGRect)frame target:(id)target action:(SEL)action
+{
+    self = [super initWithFrame:...
+    </div>
+    <ul class="post-social">
+        <li>
+            <a href="/ios/2014/04/16/ios-target-action/" class="readmore">
+                Read More <i class="fa fa-arrow-circle-o-right"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+<div class="post clearfix">
+    <div class="post-margin clearfix">
+        <h3 class="post-title">
+            <a href="/oc/2014/04/12/oc-protocal/">
+                OC protocal 的使用
+            </a>
+        </h3>
+        
+        <div class="post-subtitle">
+            
+        </div>
+        
+        <ul class="post-status">
+            <li><i class="fa fa-clock-o"></i>April 12, 2014</li>
+        </ul>
+    </div>   
+    <div class="post-margin">
+        Protocal又名协议，协议是一套标准（一堆方法的声明），只有.h文件。
+
+接受协议的对象，实现协议中定义的方法。
+
+新建文件，选择Objective-C protocal，名字为 MarrayProtocol
+
+Protocal 以 @protocal，以@end结束，例如：
+
+@protocol MarrayProtocol &lt;NSObject&gt;
+@required
+- (void)makeMoney;
+@optional
+- (void)washcloth;
+@end
+
+
+@required后的方法是必须实现的，@required可写可不写。
+
+@optional后方法是可选实现的，可实现，可不实现。
+
+协议定义好之后，需要有类去遵守这个协议，实现协议里的方法。
+
+遵守协议，即在.h文件的父类名后写上。实现协议里的方法即在.m文件中实现协议中的方法。相当于给这个类...
+    </div>
+    <ul class="post-social">
+        <li>
+            <a href="/oc/2014/04/12/oc-protocal/" class="readmore">
+                Read More <i class="fa fa-arrow-circle-o-right"></i>
+            </a>
+        </li>
+    </ul>
+</div>
+
+<!-- End Post Item -->
+<!-- Start Pagination -->
+
+<div class="pager10">
+    <ul class="pagination clearfix">
+        
+        
+        <li class="next">
+            <a href="/page2">Older Posts <i class="fa fa-arrow-circle-o-right"></i></a>
+        </li>
+        
+    </ul>
+</div>
+
+<!-- End Pagination -->
+        </div>
+    </div>
+    <!-- End Posts Container -->
+    <!-- Start Sidebar -->
+    <div class="col-1-3">
+        <div class="wrap-col">
+            <div class="widget-container">
+                <h6 class="widget-title"><a href="/tags/">Tags</a></h6>
+                
+                <div class="tagcloud">
+                    
+                        
+                            <a href="/tags/#PHP" title="PHP" rel="13">
+                                PHP
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/#Redis" title="Redis" rel="2">
+                                Redis
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/#HTML" title="HTML" rel="2">
+                                HTML
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/#C" title="C" rel="2">
+                                C
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/#Mysql" title="Mysql" rel="3">
+                                Mysql
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/#Linux" title="Linux" rel="3">
+                                Linux
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/#Nginx" title="Nginx" rel="3">
+                                Nginx
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/#Python" title="Python" rel="3">
+                                Python
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                    
+                        
+                            <a href="/tags/#iOS" title="iOS" rel="10">
+                                iOS
+                            </a>
+                        
+                    
+                        
+                            <a href="/tags/#OC" title="OC" rel="5">
+                                OC
+                            </a>
+                        
+                    
+                        
+                    
+                        
+                    
+                </div>
+                
+            </div>
+            <div class="widget-container">
+                <h6 class="widget-title"><a href="/about/">About Me</a></h6>
+                <ul class="widget-recent-posts">        
+                    <li>
+                        <div class="post-image">
+                            <div class="post-mask"></div>
+                            
+                            <img width="70" height="70" src="/img/Ellen.jpg" class="attachment-post-widget #" />
+                                   
+                        </div>
+                        
+                            <h6>极客程序媛</h6>
+                        
+                        <span>
+                            
+                            <a href="https://github.com/xpmozong" target="_blank">
+                                <i class="fa fa-github"></i>
+                            </a>
+                            
+                            
+                            <a target="_blank" href="http://weibo.com/xpmozong">
+                                <i class="fa fa-weibo"></i>
+                            </a>
+                            
+                        </span>
+                    </li>
+                </ul>
+                <!-- End Widget -->
+            </div>
+        </div>
+    </div>        
+    <!-- End Sidebar -->
+</div>
+<!-- End Main Container -->
+<p id="back-top"><a href="#top"></a></p>
+<!-- Start Footer -->
+<div class="container zerogrid clearfix">
+    <div id="footer-container" class="wrap-col">
+        <p>Copyrigh &copy; 寞踪的博客 2010-2015</p>
+    </div>
+</div>
+<!-- End Footer -->
+<!-- async load function -->
+<script type="text/javascript">
+    function async(u, c) {
+        var d = document, t = 'script',
+        o = d.createElement(t),
+        s = d.getElementsByTagName(t)[0];
+        o.src = u;
+        if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+        s.parentNode.insertBefore(o, s);
+    }
+
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+    
+    $(function(){
+        var href = location.href;
+        var localh = location.origin+"/";
+        href = href.replace(localh,"");
+        var hrearr = href.split('/');
+        $(".sf-menu li").removeClass('current-menu-item');
+        if (hrearr[0] == 'about') {
+            $("#about").addClass('current-menu-item');
+        }else if(hrearr[0] == 'tags'){
+            $("#tags").addClass('current-menu-item');
+        }else{
+            $("#home").addClass('current-menu-item');
+        }
+
+        $("pre").addClass("prettyprint");
+        prettyPrint();
+
+        // hide #back-top first
+        $("#back-top").hide();
+
+        // fade in #back-top
+        $(function () {
+            $(window).scroll(function () {
+                if ($(this).scrollTop() > 400) {
+                    $('#back-top').fadeIn();
+                } else {
+                    $('#back-top').fadeOut();
+                }
+        });
+
+        // scroll body to 0px on click
+        $('#back-top a').click(function () {
+            $('body,html').animate({
+                scrollTop: 0
+                }, 800);
+            return false;
+            });
+        });
+
+    });
+
+</script>
+</body>
+</html>
+
+
+
+
+
+<!-- BT hacking -->
+<input id="baId" type="hidden" value="6dcc729d6a5d5c61d7c8835eb7418d54"  />
+
+<!-- Baidu Tongji -->
+<script>
+    // dynamic User hacking by Hux
+    var _baId = document.getElementById('baId').value;
+
+    // Originial
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?" + _baId;
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+

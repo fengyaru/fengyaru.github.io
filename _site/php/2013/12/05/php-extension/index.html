@@ -1,0 +1,347 @@
+<!DOCTYPE html lang="en-US">
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="description" content="寞踪的技术博客，主攻PHP，iOS，Python，Linux，C。">
+<meta name="keyword"  content="寞踪的博客">
+<link rel="shortcut icon" href="img/favicon.ico">
+<title>PHP扩展开发 - 第一个扩展 - 寞踪的博客 | Ellen Blog</title>
+<link rel="canonical" href="http://xpmozong.github.io/php/2013/12/05/php-extension/">
+<link href="http://cdn.staticfile.org/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+<link rel='stylesheet' href="/css/style.css" type='text/css' media='all' />
+<link rel='stylesheet' href="/css/color/green.css" type='text/css' media='all' />
+<link href="/google-code-prettify/tomorrow-night-eighties.css" rel="stylesheet" type="text/css" media="all">
+<script src="/google-code-prettify/jquery.js"></script>
+<script src="/google-code-prettify/prettify.js"></script>
+<body class="home blog">
+    <!-- Start Header -->
+    <div class="container zerogrid clearfix">
+        <div class="col-full">
+            <div class="wrap-col">
+                <div id="header-nav-container" class="clearfix">
+                    <div class="h-logo">
+                        <a href="/">
+                            寞踪的博客
+                        </a>
+                    </div>
+                    <div class="h-menu">
+                        <!-- Navigation Menu -->     
+                        <ul class="sf-menu">
+                            <li id="home" class="menu-item current-menu-item">
+                                <a href="/">Home</a>
+                            </li>
+                            <li id="about" class="menu-item">
+                                <a href="/about/">About</a>
+                            </li>
+                            <li id="tags" class="menu-item">
+                                <a href="/tags/">Tags</a>
+                            </li>
+                        </ul> 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<!-- Start Main Container -->
+<div class="container zerogrid">
+    <div class="col-full">
+        <div class="wrap-col page-conainer">
+            <div class="post-margin">
+                <h5 class="page-title">
+                    PHP扩展开发 - 第一个扩展
+                </h5>
+                
+                <div class="post-subtitle">
+                    
+                </div>
+                
+                <ul class="post-status clearfix">
+                    <li><i class="fa fa-clock-o"></i>December 5, 2013</li>
+                </ul>
+                <div class="post-content">
+                    <p>学习PHP扩展开发，是PHPer的必学课程。接着上一节课程，<a href="/php/2013/12/05/lnmp/" target="_blank">Linux + Nginx + Mysql + PHP 编译安装</a>。</p>
+
+<p>需求：比如开发一个叫做 hello_world 的扩展，扩展里就一个函数 hello_world_test()，输入一个字符串，函数返回：Your input string: xxxxx! 。</p>
+
+<p>环境： php-5.3.16</p>
+
+<p><strong>第一步、生成代码</strong></p>
+
+<p>PHP为了扩展开发的方便，提供了一个类似代码生成器的工具ext_skel</p>
+
+<pre><code>cd /opt/php-5.3.16/ext/
+./ext_skel --extname=hello_world --proto=hello_world.skel
+cd hello_world/
+</code></pre>
+
+<p>生成代码啦</p>
+
+<p><strong>第二步，修改配置</strong></p>
+
+<p>然后修改config.m4文件将10、11、12三行最前面的dnl删除掉，就是将</p>
+
+<pre><code>dnl PHP_ARG_WITH(hello_world, for hello_world support,
+dnl Make sure that the comment is aligned:
+dnl [  --with-hello_world             Include hello_world support])
+</code></pre>
+
+<p>修改为</p>
+
+<pre><code>PHP_ARG_WITH(hello_world, for hello_world support,
+Make sure that the comment is aligned:
+[  --with-hello_world             Include hello_world support])
+</code></pre>
+
+<p><strong>第三步，实现功能</strong></p>
+
+<p>修改源码php_hello_world.h文件</p>
+
+<p>在</p>
+
+<pre><code>PHP_FUNCTION(confirm_hello_world_compiled);
+</code></pre>
+
+<p>后，添加</p>
+
+<pre><code>PHP_FUNCTION(hello_world_test);
+</code></pre>
+
+<p>然后修改源码 hello_world.c 文件</p>
+
+<p>添加</p>
+
+<pre><code>PHP_FUNCTION(hello_world_test)
+{
+        char *arg = NULL;
+        int arg_len, len;
+        char *strg;
+
+        if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &amp;arg, &amp;arg_len) == FAILURE) {
+                return;
+        }
+
+        len = spprintf(&amp;strg, 0, "Hello World! Your input string: %s\n", arg);
+        RETURN_STRINGL(strg, len, 0);
+}
+</code></pre>
+
+<p><strong>第四步，编译扩展</strong></p>
+
+<p>保存后，开始编译</p>
+
+<pre><code>/usr/local/php/bin/phpize
+./configure --with-php-config=/usr/local/php/bin/php-config
+make
+make test
+make install
+</code></pre>
+
+<p><strong>第五步，添加扩展</strong></p>
+
+<p>现在看看是不是有个 /usr/local/php/lib/php/extensions/no-debug-non-zts-20090626/hello_world.so</p>
+
+<p>编辑php.ini配置文件，把扩展加入进去：</p>
+
+<pre><code>// 扩展路径
+extension_dir = "/usr/local/php/lib/php/extensions/no-debug-non-zts-20090626/"
+extension = hello_world.so
+</code></pre>
+
+<p>保存退出。</p>
+
+<p><strong>第六步，检查安装结果</strong></p>
+
+<p>编辑test.php文件</p>
+
+<pre><code>echo "&lt;pre&gt;";
+$str = confirm_hello_world_compiled(hello_world);
+echo $str."&lt;br&gt;";
+
+print_r(get_loaded_extensions());
+print_r(get_extension_funcs('hello_world'));
+echo hello_world_test('My first php extension! ');
+</code></pre>
+
+<p>看看有没有结果输出！</p>
+
+                </div>
+                
+                <!-- 多说 Share start -->
+                <div class="ds-share"
+                    style="text-align: right"
+                    data-thread-key="/php/2013/12/05/php-extension"
+                    data-title="PHP扩展开发 - 第一个扩展"
+                    data-url="http://xpmozong.github.io/php/2013/12/05/php-extension/"
+                    data-images="http://xpmozong.github.io/img/post-bg-2015.jpg"
+                    data-content="学习PHP扩展开发，是PHPer的必学课程。接着上一节课程，Linux + Nginx + Mysql + PHP 编译安装。
+
+需求：比如开发一个叫做 ... | 寞踪的博客 | Ellen Blog " >
+                    <div class="ds-share-inline">
+                      <ul  class="ds-share-icons-16">
+                        <li data-toggle="ds-share-icons-more"><a class="ds-more" href="#">分享到：</a></li>
+                        <li><a class="ds-wechat flat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+                        <li><a class="ds-weibo flat" href="javascript:void(0);" data-service="weibo">微博</a></li>
+                        <li><a class="ds-douban flat" href="javascript:void(0);" data-service="douban">豆瓣</a></li>
+                      </ul>
+                      <div class="ds-share-icons-more">
+                      </div>
+                    </div>
+                <hr>
+                </div>
+                <!-- 多说 Share end-->
+                
+                <div class="pager20">
+                    <ul class="pagination clearfix">
+                        
+                        <li class="previous">
+                            <a href="/php/2013/12/05/lnmp/" data-toggle="tooltip" data-placement="top" title="Linux + Nginx + Mysql + PHP 编译安装">
+                                <i class="fa fa-arrow-circle-o-left"></i> Previous Post
+                            </a>
+                        </li>
+                        
+                        
+                        <li class="next">
+                            <a href="/c/2014/03/20/c-zhizhen/" data-toggle="tooltip" data-placement="top" title="C语言指针">
+                                Next Post <i class="fa fa-arrow-circle-o-right"></i>
+                            </a>
+                        </li>
+                        
+                    </ul>
+                </div>
+                
+                <!-- 多说评论框 start -->
+                <div class="comment">
+                    <div class="ds-thread"
+                        data-thread-key="/php/2013/12/05/php-extension"
+                        data-title="PHP扩展开发 - 第一个扩展"
+                        data-url="http://xpmozong.github.io/php/2013/12/05/php-extension/" >
+                    </div>
+                </div>
+                <!-- 多说评论框 end -->
+
+                <!-- Duoshuo hacking -->
+                <input id="dsUser" type="hidden" value="xpmozong"  />
+
+                <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+                <script type="text/javascript">
+                    // dynamic User hacking by Hux
+                    var _user = document.getElementById('dsUser').value;
+                    // duoshuo comment query.
+                    var duoshuoQuery = {short_name: _user };
+                    (function() {
+                        var ds = document.createElement('script');
+                        ds.type = 'text/javascript';ds.async = true;
+                        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+                        ds.charset = 'UTF-8';
+                        (document.getElementsByTagName('head')[0]
+                         || document.getElementsByTagName('body')[0]).appendChild(ds);
+                    })();
+                </script>
+                <!-- 多说公共JS代码 end -->
+                
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Main Container -->
+<p id="back-top"><a href="#top"></a></p>
+<!-- Start Footer -->
+<div class="container zerogrid clearfix">
+    <div id="footer-container" class="wrap-col">
+        <p>Copyrigh &copy; 寞踪的博客 2010-2015</p>
+    </div>
+</div>
+<!-- End Footer -->
+<!-- async load function -->
+<script type="text/javascript">
+    function async(u, c) {
+        var d = document, t = 'script',
+        o = d.createElement(t),
+        s = d.getElementsByTagName(t)[0];
+        o.src = u;
+        if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+        s.parentNode.insertBefore(o, s);
+    }
+
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+    
+    $(function(){
+        var href = location.href;
+        var localh = location.origin+"/";
+        href = href.replace(localh,"");
+        var hrearr = href.split('/');
+        $(".sf-menu li").removeClass('current-menu-item');
+        if (hrearr[0] == 'about') {
+            $("#about").addClass('current-menu-item');
+        }else if(hrearr[0] == 'tags'){
+            $("#tags").addClass('current-menu-item');
+        }else{
+            $("#home").addClass('current-menu-item');
+        }
+
+        $("pre").addClass("prettyprint");
+        prettyPrint();
+
+        // hide #back-top first
+        $("#back-top").hide();
+
+        // fade in #back-top
+        $(function () {
+            $(window).scroll(function () {
+                if ($(this).scrollTop() > 400) {
+                    $('#back-top').fadeIn();
+                } else {
+                    $('#back-top').fadeOut();
+                }
+        });
+
+        // scroll body to 0px on click
+        $('#back-top a').click(function () {
+            $('body,html').animate({
+                scrollTop: 0
+                }, 800);
+            return false;
+            });
+        });
+
+    });
+
+</script>
+</body>
+</html>
+
+
+
+
+
+<!-- BT hacking -->
+<input id="baId" type="hidden" value="6dcc729d6a5d5c61d7c8835eb7418d54"  />
+
+<!-- Baidu Tongji -->
+<script>
+    // dynamic User hacking by Hux
+    var _baId = document.getElementById('baId').value;
+
+    // Originial
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?" + _baId;
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+

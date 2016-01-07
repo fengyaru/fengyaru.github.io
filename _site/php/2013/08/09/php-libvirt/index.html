@@ -1,0 +1,464 @@
+<!DOCTYPE html lang="en-US">
+<!--[if lt IE 7 ]><html class="ie ie6" lang="en"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--><html lang="en"> <!--<![endif]-->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="description" content="寞踪的技术博客，主攻PHP，iOS，Python，Linux，C。">
+<meta name="keyword"  content="寞踪的博客">
+<link rel="shortcut icon" href="img/favicon.ico">
+<title>libvirt-php 学习小记 - 寞踪的博客 | Ellen Blog</title>
+<link rel="canonical" href="http://xpmozong.github.io/php/2013/08/09/php-libvirt/">
+<link href="http://cdn.staticfile.org/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+<link rel='stylesheet' href="/css/style.css" type='text/css' media='all' />
+<link rel='stylesheet' href="/css/color/green.css" type='text/css' media='all' />
+<link href="/google-code-prettify/tomorrow-night-eighties.css" rel="stylesheet" type="text/css" media="all">
+<script src="/google-code-prettify/jquery.js"></script>
+<script src="/google-code-prettify/prettify.js"></script>
+<body class="home blog">
+    <!-- Start Header -->
+    <div class="container zerogrid clearfix">
+        <div class="col-full">
+            <div class="wrap-col">
+                <div id="header-nav-container" class="clearfix">
+                    <div class="h-logo">
+                        <a href="/">
+                            寞踪的博客
+                        </a>
+                    </div>
+                    <div class="h-menu">
+                        <!-- Navigation Menu -->     
+                        <ul class="sf-menu">
+                            <li id="home" class="menu-item current-menu-item">
+                                <a href="/">Home</a>
+                            </li>
+                            <li id="about" class="menu-item">
+                                <a href="/about/">About</a>
+                            </li>
+                            <li id="tags" class="menu-item">
+                                <a href="/tags/">Tags</a>
+                            </li>
+                        </ul> 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<!-- Start Main Container -->
+<div class="container zerogrid">
+    <div class="col-full">
+        <div class="wrap-col page-conainer">
+            <div class="post-margin">
+                <h5 class="page-title">
+                    libvirt-php 学习小记
+                </h5>
+                
+                <div class="post-subtitle">
+                    
+                </div>
+                
+                <ul class="post-status clearfix">
+                    <li><i class="fa fa-clock-o"></i>August 9, 2013</li>
+                </ul>
+                <div class="post-content">
+                    <p>Libvirt 库是一种实现 Linux 虚拟化功能的 Linux® API，它支持各种虚拟机监控程序，包括 Xen 和 KVM，以及 QEMU 和用于其他操作系统的一些虚拟产品。</p>
+
+<p>一、安装libvirt环境</p>
+
+<p>(1)、yum install virt-manager libvirt libvirt-python python-virtinst -y</p>
+
+<p>(2)、升级</p>
+
+<pre><code>yum -y install gcc gcc-c++
+yum install libxml2-devel gnutls-devel device-mapper-devel python-devel libnl-devel -y
+wget http://libvirt.org/sources/libvirt-1.1.1.tar.gz
+tar xzvf libvirt-0.9.4.tar.gz
+cd libvirt-0.9.4
+./configure
+make &amp;&amp; make install
+
+[root@localhost ~]# service libvirtd start
+</code></pre>
+
+<p>virsh -version 可能会报错</p>
+
+<p>1、error: Failed to connect socket to ‘/usr/local/var/run/libvirt/libvirt-sock’: No such file or directory</p>
+
+<p>做个链接：</p>
+
+<pre><code>ln -s /var/run/libvirt/libvirt-sock /usr/local/var/run/libvirt/libvirt-sock
+</code></pre>
+
+<p>2、libvirt: Remote error : unable to connect to ‘/usr/local/var/run/libvirt/libvirt-sock-ro’: No such file or directory</p>
+
+<p>再做个链接</p>
+
+<pre><code>ln -s /var/run/libvirt/libvirt-sock-ro /usr/local/var/run/libvirt/libvirt-sock-ro
+
+[root@localhost ~]# virsh -version
+0.10.0
+[root@localhost ~]# libvirtd --version
+libvirtd (libvirt) 1.1.1
+</code></pre>
+
+<p>重启下电脑</p>
+
+<pre><code>[root@localhost ~]# virsh -version
+1.1.1
+</code></pre>
+
+<p>二、创建虚拟机</p>
+
+<p>1、demo.xml</p>
+
+<pre><code>&lt;domain type='kvm'&gt;
+    &lt;name&gt;myvm&lt;/name&gt; &lt;!-- 名称 --&gt;
+    &lt;memory&gt;10485760&lt;/memory&gt; &lt;!-- 内存 --&gt;
+    &lt;currentMemory&gt;10485760&lt;/currentMemory&gt;
+    &lt;vcpu&gt;1&lt;/vcpu&gt;
+    &lt;os&gt;
+        &lt;type arch='x86_64' machine='pc'&gt;hvm&lt;/type&gt; &lt;!-- 系统 --&gt;
+        &lt;boot dev='hd'/&gt; &lt;!-- 从硬盘启动 --&gt;
+    &lt;/os&gt;
+    &lt;features&gt;
+    &lt;acpi/&gt;
+    &lt;apic/&gt;
+    &lt;pae/&gt;
+    &lt;/features&gt;
+    &lt;clock offset='localtime'/&gt;
+    &lt;on_poweroff&gt;destroy&lt;/on_poweroff&gt;
+    &lt;on_reboot&gt;restart&lt;/on_reboot&gt;
+    &lt;on_crash&gt;destroy&lt;/on_crash&gt;
+    &lt;devices&gt;
+        &lt;emulator&gt;/usr/libexec/qemu-kvm&lt;/emulator&gt;
+        &lt;disk type='file' device='disk'&gt;
+            &lt;source file='/data/instances/myvm/disk.qcow2'/&gt;
+            &lt;target dev='sdb' bus='virtio'/&gt;  &lt;!-- 用sdb --&gt;
+        &lt;/disk&gt;
+        &lt;disk type='file' device='disk'&gt;
+            &lt;driver name='qemu' type='qcow2'/&gt;
+            &lt;source file='/data/instances/myvm/swap.qcow2'/&gt;
+            &lt;target dev='sdb' bus='virtio'/&gt;
+        &lt;/disk&gt;
+        &lt;disk type='file' device='disk'&gt;
+            &lt;driver name='qemu' type='qcow2'/&gt;
+            &lt;source file='/data/instances/myvm/disk2.qcow2'/&gt;
+            &lt;target dev='sdc' bus='virtio'/&gt;
+        &lt;/disk&gt;
+        &lt;disk type='file' device='cdrom'&gt;
+            &lt;driver name='qemu' type='raw'/&gt;
+            &lt;source file='/data/instances/myvm/meta.iso'/&gt; &lt;!-- 这里是有作用的，稍后解释 --&gt;
+            &lt;target dev='hda' bus='ide'/&gt;
+            &lt;readonly/&gt;
+        &lt;/disk&gt;
+        &lt;interface type='bridge'&gt;
+            &lt;source bridge='virbr0'/&gt;
+            &lt;mac address="00:16:3e:5d:aa:a8"/&gt;
+            &lt;filterref&gt;
+                &lt;parameter name='IP' value='192.168.1.1' /&gt;
+            &lt;/filterref&gt;
+        &lt;/interface&gt;
+        &lt;input type='mouse' bus='ps2'/&gt;
+        &lt;graphics type='vnc' port='-1' autoport='yes' keymap='en-us' listen='0.0.0.0'/&gt; 
+        &lt;!-- ip 端口5900 累计相加 --&gt;
+    &lt;/devices&gt;
+&lt;/domain&gt;
+</code></pre>
+
+<p>2、定义KVM</p>
+
+<pre><code>[root@localhost ~]# virsh define demo.xml 
+Domain myvm defined from demo.xml
+</code></pre>
+
+<p>3、启动KVM</p>
+
+<pre><code>[root@localhost ~]# virsh start myvm
+Domain myvm started
+</code></pre>
+
+<p>myvm 只的是demo.xml里的虚拟机名称</p>
+
+<p>4、查看vnc信息</p>
+
+<pre><code>[root@localhost ~]# virsh vncdisplay myvm
+127.0.0.1:2
+</code></pre>
+
+<p>5、如何修改</p>
+
+<pre><code>virsh edit &lt;Name of KVM&gt;
+</code></pre>
+
+<p>6、查看运行中的虚拟机</p>
+
+<pre><code>[root@localhost ~]# virsh list
+[root@localhost ~]# virsh list --all
+</code></pre>
+
+<p>7、meta.iso 是什么呢？</p>
+
+<p>创建完一台虚拟机后，要给虚拟机分配IP，挂载磁盘，所以要先把要配置的信息存入一个文件，做成iso，然后挂载上，虚拟机在开机的时候，挂载上文件，读取他，处理他。这个脚本，运维的人会写，很简单的事。格式自己定。</p>
+
+<p>例如meta.js文件转成meta.iso的命令是：mkisofs -r -o meta.iso meta.js</p>
+
+<p>三、用python创建虚拟机</p>
+
+<p>demo.xml  注意，虚拟机名字要换一下</p>
+
+<pre><code>#encoding:utf8
+import libvirt
+
+uri='qemu:///system'
+conn =libvirt.open(uri) #这里要用读写的方式打开连接  
+
+with open('demo.xml') as f:  
+    xml = f.read()  
+
+domain = conn.defineXML(xml)  
+domain.createWithFlags(0)  
+  
+try:  
+    dom0 = conn.lookupByName("pyvm")  #虚拟机名称
+except:  
+    print 'Failed to find the main domain'  
+    sys.exit(1)  
+  
+print "Domain 0: id %d running %s" % (dom0.ID(), dom0.OSType())  
+print dom0.info()
+</code></pre>
+
+<p>四、用php创建虚拟机</p>
+
+<p>再安装依赖包：yum -y install gcc gcc.c++ zlib libxml2 libxml2-devel libmcrypt libcrypt-devel libmhash libjpeg libpng</p>
+
+<p>然后安装PHP APACHE MYSQL</p>
+
+<pre><code>yum -y install httpd httpd-devel mysql-server mysql-devel php php-devel php-gd php-mysql
+</code></pre>
+
+<p>然后再装libvirt-php</p>
+
+<pre><code>wget http://libvirt.org/sources/php/libvirt-php-0.4.8.tar.gz
+tar -zxvf libvirt-php-0.4.8.tar.gz
+</code></pre>
+
+<p>然后</p>
+
+<pre><code>cd libvirt-php*
+./configure
+</code></pre>
+
+<p>编译的时候如果报错，提示You need libvirt 说明libvirt开发包没有安装好，运行</p>
+
+<pre><code>yum -y install libvirt-devel
+</code></pre>
+
+<p>最后运行</p>
+
+<pre><code>make &amp;&amp; make install
+</code></pre>
+
+<p>建一个测试php文件</p>
+
+<pre><code>print_r( libvirt_version() );  // 有结果，就表示，安装成功啦
+</code></pre>
+
+<p>可能有人不喜欢apache，ok，就安装nginx呗，顺便 yum -y install php-fpm</p>
+
+<p>启动service php-fpm start</p>
+
+<p>这里就不详细说啦</p>
+
+<p>从 https://github.com/xpmozong/libvirt-php-examples 下载例子</p>
+
+<p>[root@localhost examples]# php create.php  创建<br />
+[root@localhost examples]# php test.php    列出虚拟机列表</p>
+
+<p>其中libvirt.php 里有很多函数，没写全，要添加的话参考http://libvirt.org/php/api-reference.html</p>
+
+<p>php有执行libvirt的权限，但是apache、nginx没有这个权限，所以要赋予权限。</p>
+
+<p>还有通过web访问，要设置libvirt的认证，vim /etc/libvirt/libvirtd.conf 文件 auth_tcp = “none”</p>
+
+<p>brctl show 查看网桥</p>
+
+<p>跟重要的是，要有VNC啊，推荐 <a href="http://kanaka.github.io/noVNC/">noVNC</a></p>
+
+                </div>
+                
+                <!-- 多说 Share start -->
+                <div class="ds-share"
+                    style="text-align: right"
+                    data-thread-key="/php/2013/08/09/php-libvirt"
+                    data-title="libvirt-php 学习小记"
+                    data-url="http://xpmozong.github.io/php/2013/08/09/php-libvirt/"
+                    data-images="http://xpmozong.github.io/img/post-bg-2015.jpg"
+                    data-content="Libvirt 库是一种实现 Linux 虚拟化功能的 Linux® API，它支持各种虚拟机监控程序，包括 Xen 和 KVM，以及 QEMU 和用于其... | 寞踪的博客 | Ellen Blog " >
+                    <div class="ds-share-inline">
+                      <ul  class="ds-share-icons-16">
+                        <li data-toggle="ds-share-icons-more"><a class="ds-more" href="#">分享到：</a></li>
+                        <li><a class="ds-wechat flat" href="javascript:void(0);" data-service="wechat">微信</a></li>
+                        <li><a class="ds-weibo flat" href="javascript:void(0);" data-service="weibo">微博</a></li>
+                        <li><a class="ds-douban flat" href="javascript:void(0);" data-service="douban">豆瓣</a></li>
+                      </ul>
+                      <div class="ds-share-icons-more">
+                      </div>
+                    </div>
+                <hr>
+                </div>
+                <!-- 多说 Share end-->
+                
+                <div class="pager20">
+                    <ul class="pagination clearfix">
+                        
+                        <li class="previous">
+                            <a href="/php/2013/07/09/php-memcached/" data-toggle="tooltip" data-placement="top" title="Windows下安装配置PHP Memcached">
+                                <i class="fa fa-arrow-circle-o-left"></i> Previous Post
+                            </a>
+                        </li>
+                        
+                        
+                        <li class="next">
+                            <a href="/python/2013/09/05/python-saltstack/" data-toggle="tooltip" data-placement="top" title="saltstack 学习小记">
+                                Next Post <i class="fa fa-arrow-circle-o-right"></i>
+                            </a>
+                        </li>
+                        
+                    </ul>
+                </div>
+                
+                <!-- 多说评论框 start -->
+                <div class="comment">
+                    <div class="ds-thread"
+                        data-thread-key="/php/2013/08/09/php-libvirt"
+                        data-title="libvirt-php 学习小记"
+                        data-url="http://xpmozong.github.io/php/2013/08/09/php-libvirt/" >
+                    </div>
+                </div>
+                <!-- 多说评论框 end -->
+
+                <!-- Duoshuo hacking -->
+                <input id="dsUser" type="hidden" value="xpmozong"  />
+
+                <!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+                <script type="text/javascript">
+                    // dynamic User hacking by Hux
+                    var _user = document.getElementById('dsUser').value;
+                    // duoshuo comment query.
+                    var duoshuoQuery = {short_name: _user };
+                    (function() {
+                        var ds = document.createElement('script');
+                        ds.type = 'text/javascript';ds.async = true;
+                        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+                        ds.charset = 'UTF-8';
+                        (document.getElementsByTagName('head')[0]
+                         || document.getElementsByTagName('body')[0]).appendChild(ds);
+                    })();
+                </script>
+                <!-- 多说公共JS代码 end -->
+                
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Main Container -->
+<p id="back-top"><a href="#top"></a></p>
+<!-- Start Footer -->
+<div class="container zerogrid clearfix">
+    <div id="footer-container" class="wrap-col">
+        <p>Copyrigh &copy; 寞踪的博客 2010-2015</p>
+    </div>
+</div>
+<!-- End Footer -->
+<!-- async load function -->
+<script type="text/javascript">
+    function async(u, c) {
+        var d = document, t = 'script',
+        o = d.createElement(t),
+        s = d.getElementsByTagName(t)[0];
+        o.src = u;
+        if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+        s.parentNode.insertBefore(o, s);
+    }
+
+    // only load tagcloud.js in tag.html
+    if($('#tag_cloud').length !== 0){
+        async("/js/jquery.tagcloud.js",function(){
+            $.fn.tagcloud.defaults = {
+                //size: {start: 1, end: 1, unit: 'em'},
+                color: {start: '#bbbbee', end: '#0085a1'},
+            };
+            $('#tag_cloud a').tagcloud();
+        })
+    }
+    
+    $(function(){
+        var href = location.href;
+        var localh = location.origin+"/";
+        href = href.replace(localh,"");
+        var hrearr = href.split('/');
+        $(".sf-menu li").removeClass('current-menu-item');
+        if (hrearr[0] == 'about') {
+            $("#about").addClass('current-menu-item');
+        }else if(hrearr[0] == 'tags'){
+            $("#tags").addClass('current-menu-item');
+        }else{
+            $("#home").addClass('current-menu-item');
+        }
+
+        $("pre").addClass("prettyprint");
+        prettyPrint();
+
+        // hide #back-top first
+        $("#back-top").hide();
+
+        // fade in #back-top
+        $(function () {
+            $(window).scroll(function () {
+                if ($(this).scrollTop() > 400) {
+                    $('#back-top').fadeIn();
+                } else {
+                    $('#back-top').fadeOut();
+                }
+        });
+
+        // scroll body to 0px on click
+        $('#back-top a').click(function () {
+            $('body,html').animate({
+                scrollTop: 0
+                }, 800);
+            return false;
+            });
+        });
+
+    });
+
+</script>
+</body>
+</html>
+
+
+
+
+
+<!-- BT hacking -->
+<input id="baId" type="hidden" value="6dcc729d6a5d5c61d7c8835eb7418d54"  />
+
+<!-- Baidu Tongji -->
+<script>
+    // dynamic User hacking by Hux
+    var _baId = document.getElementById('baId').value;
+
+    // Originial
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?" + _baId;
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+</script>
+
